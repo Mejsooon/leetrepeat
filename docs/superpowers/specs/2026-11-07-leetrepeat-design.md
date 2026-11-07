@@ -231,6 +231,14 @@ Walidacja przez modele Pydantic; błędy → HTTP 422 z nazwą pola. Nieistniej�
 
 Interfejs w języku polskim.
 
+**Tryb jasny i ciemny:** przycisk ze słońcem/księżycem w nagłówku każdego ekranu przełącza motyw.
+Kolory zdefiniowane jako zmienne CSS w dwóch zestawach (`.lr-dark`, `.lr-light`) na elemencie głównym.
+Wybór zapisywany w `localStorage` przeglądarki (klucz `leetrepeat-theme`); domyślnie motyw systemowy
+(`prefers-color-scheme`), a gdy niedostępny — ciemny. Edytor Monaco przełącza się odpowiednio
+między motywami `vs-dark` i `vs`.
+
+Makiety ekranów: artefakt Design „LeetRepeat — makiety ekranów”.
+
 ## 8. Testy
 
 pytest + `fastapi.testclient`:
