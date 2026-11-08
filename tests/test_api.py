@@ -16,7 +16,7 @@ def db_path(tmp_path):
 
 @pytest.fixture
 def client(db_path):
-    return TestClient(create_app(db_path))
+    return TestClient(create_app(db_path), base_url="http://127.0.0.1:8000")
 
 
 @pytest.fixture
@@ -120,3 +120,16 @@ def test_run_missing_runtime(client, monkeypatch):
     res = client.post("/api/run", json={"language": "csharp", "kind": "program", "code": "",
                                         "tests": [{"input": "", "expected": ""}]})
     assert res.status_code == 400 and res.json()["detail"] == "brak"
+
+
+def test_update_missing_task_404(client, task_body):    # przegląd: Important 4
+    res = client.put("/api/tasks/9999", json=task_body)
+    assert res.status_code == 404 and res.json()["detail"] == "Nie ma takiego zadania"
+
+
+def test_rejects_foreign_host(client):                  # przegląd: Important 3 (DNS rebinding)
+    res = client.post("/api/run", headers={"Host": "evil.example:8000"},
+                      json={"language": "python", "kind": "program", "code": "print(1)",
+                            "tests": [{"input": "", "expected": "1"}]})
+    assert res.status_code == 400
+    assert client.get("/api/summary", headers={"Host": "localhost:8000"}).status_code == 200

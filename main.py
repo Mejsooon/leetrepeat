@@ -6,6 +6,7 @@ from typing import Literal
 import uvicorn
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 from pydantic import BaseModel, Field
 
 from db import connect
@@ -55,6 +56,9 @@ class ReviewIn(BaseModel):
 
 def create_app(db_path: str) -> FastAPI:
     app = FastAPI(title="LeetRepeat")
+    # Tylko adresy lokalne: strona z internetu podszywająca się pod 127.0.0.1 (DNS rebinding)
+    # dostanie 400 i nie uruchomi kodu na tym komputerze
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
 
     @app.get("/api/tasks")
     def list_tasks(language: str | None = None):
@@ -103,15 +107,15 @@ def create_app(db_path: str) -> FastAPI:
     @app.put("/api/tasks/{task_id}")
     def update_task(task_id: int, body: TaskIn):
         con = connect(db_path)
+        if con.execute("SELECT id FROM tasks WHERE id = ?", (task_id,)).fetchone() is None:
+            con.close()
+            raise HTTPException(404, "Nie ma takiego zadania")
         with con:
-            cur = con.execute(
+            con.execute(
                 "UPDATE tasks SET title = ?, language = ?, kind = ?, description = ?, starter_code = ?,"
                 " hint = ?, solution = ? WHERE id = ?",
                 (body.title, body.language, body.kind, body.description, body.starter_code, body.hint,
                  body.solution, task_id))
-            if cur.rowcount == 0:
-                con.close()
-                raise HTTPException(404, "Nie ma takiego zadania")
             # Testy zastępujemy w całości; harmonogram (interval_days, due_date) zostaje bez zmian
             con.execute("DELETE FROM tests WHERE task_id = ?", (task_id,))
             for position, test in enumerate(body.tests):

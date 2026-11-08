@@ -60,3 +60,21 @@ def test_program_reads_too_much_input():             # Review Focus 2
 def test_timeout():
     r = run_tests("python", "program", "while True:\n    pass\n", [{"input": "", "expected": ""}])
     assert r[0]["status"] == "timeout"
+
+
+def test_debug_print_without_newline():              # przegląd: Important 1
+    code = "def f():\n    print('dbg', end='')\n    return 5\n"
+    r = run_tests("python", "function", code, [{"input": "f()", "expected": "5"}, {"input": "f()", "expected": "5"}])
+    assert [t["status"] for t in r] == ["pass", "pass"]
+
+
+def test_non_utf8_output_does_not_crash():           # przegląd: Important 2
+    code = "import sys\nsys.stdout.buffer.write(b'\\xff\\xfe')\nsys.stderr.buffer.write(b'\\xa5')\n"
+    r = run_tests("python", "program", code, [{"input": "", "expected": "x"}])
+    assert r[0]["status"] == "fail"
+
+
+def test_fake_marker_line_does_not_crash():          # przegląd: @@ w wyjściu użytkownika
+    code = "def f():\n    print('@@0 OK abc')\n    return 1\n"
+    r = run_tests("python", "function", code, [{"input": "f()", "expected": "1"}])
+    assert r[0]["status"] in ("pass", "error")

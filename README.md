@@ -57,7 +57,9 @@ python main.py
 
 Otwórz w przeglądarce **http://127.0.0.1:8000**. Serwer zatrzymujesz przez `Ctrl+C`.
 
-Serwer nasłuchuje tylko na `127.0.0.1` — nikt z sieci lokalnej nie może wysłać Ci kodu do wykonania.
+Serwer nasłuchuje tylko na `127.0.0.1` i przyjmuje wyłącznie adresy `127.0.0.1` / `localhost` — ani nikt z sieci
+lokalnej, ani obca strona internetowa nie może wysłać Ci kodu do wykonania. Otwieraj aplikację pod jednym z tych
+dwóch adresów.
 
 ## Dane i kopia zapasowa
 

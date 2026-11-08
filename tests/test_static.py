@@ -6,7 +6,7 @@ from main import create_app
 
 @pytest.fixture
 def client(tmp_path):
-    return TestClient(create_app(str(tmp_path / "t.db")))
+    return TestClient(create_app(str(tmp_path / "t.db")), base_url="http://127.0.0.1:8000")
 
 
 def test_vendor_and_shared_files_served(client):
