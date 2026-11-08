@@ -265,3 +265,6 @@ textarea.input { line-height: 1.6; resize: vertical; }
 @media (prefers-reduced-transparency: reduce) {
   .bar { background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; }
 }
+
+/* Kursor w edytorze Monaco: wysokość zbliżona do liter, a nie całej linii (jak kursor tekstu w macOS) */
+.monaco-editor .cursors-layer .cursor { transform: scaleY(0.78); border-radius: 1px; }

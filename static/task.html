@@ -454,12 +454,13 @@ require.config({ paths: { vs: "/vendor/monaco/vs" } });
 require(["vs/editor/editor.main"], function () {
   // Motywy edytora w kolorach aplikacji (tło jak --code-bg)
   monaco.editor.defineTheme("lr-light", { base: "vs", inherit: true, rules: [],
-    colors: { "editor.background": "#FAFBFD", "editorLineNumber.foreground": "#9AA3B5", "editorGutter.background": "#FAFBFD" } });
+    colors: { "editor.background": "#FAFBFD", "editorLineNumber.foreground": "#9AA3B5", "editorGutter.background": "#FAFBFD", "editorCursor.foreground": "#2B4FD8" } });
   monaco.editor.defineTheme("lr-dark", { base: "vs-dark", inherit: true, rules: [],
-    colors: { "editor.background": "#10182A", "editorLineNumber.foreground": "#4F5D7A", "editorGutter.background": "#10182A" } });
+    colors: { "editor.background": "#10182A", "editorLineNumber.foreground": "#4F5D7A", "editorGutter.background": "#10182A", "editorCursor.foreground": "#86A0FF" } });
   editor = monaco.editor.create(document.getElementById("editor"), {
     value: "", language: "python", theme: lrIsDark() ? "lr-dark" : "lr-light", automaticLayout: true,
-    minimap: { enabled: false }, fontSize: 14.5, lineHeight: 25,
+    minimap: { enabled: false }, fontSize: 14, lineHeight: 22,
+    cursorWidth: 2, cursorBlinking: "smooth", cursorSmoothCaretAnimation: "on",
     fontFamily: '"IBM Plex Mono", ui-monospace, Consolas, monospace', scrollBeyondLastLine: false,
     tabSize: 4, padding: { top: 16 }, renderLineHighlight: "none"
   });
@@ -467,6 +468,7 @@ require(["vs/editor/editor.main"], function () {
   window.addEventListener("themechange", function (e) {
     monaco.editor.setTheme(e.detail === "ciemny" ? "lr-dark" : "lr-light");
   });
+  document.fonts.load('14px "IBM Plex Mono"').then(function () { monaco.editor.remeasureFonts(); });
 
   if (session) {
     document.getElementById("session-bar").hidden = false;
