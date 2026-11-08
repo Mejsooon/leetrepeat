@@ -360,8 +360,11 @@ function runTests() {
 document.getElementById("run").addEventListener("click", runTests);
 
 // --- Ocena ---
+var saving = false;                              // trwa zapis oceny — kolejne naciśnięcia są ignorowane
+
 function rate(rating) {
-  if (!task || document.getElementById("rates-box").hidden) return;
+  if (!task || saving || document.getElementById("rates-box").hidden) return;
+  saving = true;
   var buttons = document.querySelectorAll("#rates-box .rate");
   buttons.forEach(function (b) { b.disabled = true; });
   fetch("/api/tasks/" + task.id + "/review", {
@@ -391,7 +394,10 @@ function rate(rating) {
       showDock(true);
     })
     .catch(function (err) { showError("Nie udało się zapisać oceny (" + err.message + ")."); })
-    .finally(function () { buttons.forEach(function (b) { b.disabled = false; }); });
+    .finally(function () {
+      saving = false;
+      buttons.forEach(function (b) { b.disabled = false; });
+    });
 }
 document.querySelectorAll("#rates-box .rate").forEach(function (b) {
   b.addEventListener("click", function () { rate(b.dataset.rating); });
