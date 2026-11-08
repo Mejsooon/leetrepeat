@@ -29,3 +29,8 @@ def test_pages_served(client):
 def test_form_served(client):
     form = client.get("/form.html").text
     assert "Nowe zadanie" in form and "Sprawdź rozwiązanie na testach" in form
+
+
+def test_task_page_served(client):
+    page = client.get("/task.html").text
+    assert "Uruchom testy" in page and "Nie pamiętam" in page and "Przywróć kod startowy" in page

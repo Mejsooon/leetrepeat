@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="pl" class="lr-dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LeetRepeat — Zadanie</title>
+<script src="/theme.js"></script>
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="data:,">
+</head>
+<body>
+<header class="lr-header">
+  <a class="lr-logo" href="/"><span class="lr-logo-mark">&lt;/&gt;</span><span class="lr-logo-name">LeetRepeat</span></a>
+  <div class="lr-nav" style="gap: 16px">
+    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Przełącz tryb jasny / ciemny"></button>
+    <div id="session-bar" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap" hidden>
+      <span id="session-label" style="color: var(--muted); font-size: 14px"></span>
+      <div style="display: flex; align-items: center; gap: 10px">
+        <div class="progress"><div id="progress-fill" style="width: 0"></div></div>
+        <span id="progress-text" class="mono" style="font-size: 14px; font-weight: 600"></span>
+      </div>
+      <a href="/" class="btn btn-small btn-ghost" style="min-height: 40px">Zakończ sesję</a>
+    </div>
+    <div id="plain-nav" class="lr-nav" hidden>
+      <a href="/">Start</a>
+      <a href="/list.html">Wszystkie zadania</a>
+    </div>
+  </div>
+</header>
+
+<main id="finished" class="page page-narrow" style="padding-top: 72px" hidden>
+  <div class="card" style="align-items: center; text-align: center">
+    <h1 style="font-size: 32px">Koniec na dziś 🎉</h1>
+    <p id="finished-text" class="muted"></p>
+    <a class="btn btn-primary" href="/">Wróć na Start</a>
+  </div>
+</main>
+
+<main id="task-area" class="task-layout" hidden>
+  <aside class="task-left">
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <span id="chip-lang" class="chip"></span>
+        <span id="chip-kind" class="chip"></span>
+        <span id="chip-last" class="chip chip-plain" hidden></span>
+      </div>
+      <h1 id="title" style="font-size: 28px"></h1>
+    </div>
+
+    <div id="description" class="prose"></div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <button type="button" id="hint-toggle" class="toggle">
+        <span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"></path></svg>
+          Podpowiedź
+        </span>
+        <span class="state" id="hint-state">pokaż</span>
+      </button>
+      <div id="hint-box" class="hint-box" hidden></div>
+
+      <button type="button" id="solution-toggle" class="toggle">
+        <span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z"></path><path d="M22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"></path></svg>
+          Pełne rozwiązanie
+        </span>
+        <span class="state" id="solution-state">pokaż</span>
+      </button>
+      <pre id="solution-box" class="code-box" hidden></pre>
+    </div>
+  </aside>
+
+  <section class="task-right">
+    <div class="editor-box">
+      <div class="editor-head"><span id="file-name" class="mono"></span><span>edytor</span></div>
+      <div id="editor" class="editor"></div>
+    </div>
+
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
+      <button type="button" id="run" class="btn btn-run">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+        <span id="run-label">Uruchom testy</span>
+      </button>
+      <button type="button" id="reset" class="btn btn-ghost">Przywróć kod startowy</button>
+      <span id="run-info" class="muted" style="font-size: 13px"></span>
+    </div>
+
+    <div class="card" style="padding: 16px 18px; gap: 10px; border-radius: 12px">
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <h2>Wyniki testów</h2>
+        <span id="results-count" class="mono" style="font-size: 13px; font-weight: 600"></span>
+      </div>
+      <p id="results-empty" class="muted">Kliknij „Uruchom testy”, żeby sprawdzić swój kod.</p>
+      <div id="results" class="results"></div>
+    </div>
+
+    <div class="card" style="padding: 18px; gap: 14px; border-radius: 12px; margin-top: 8px">
+      <h2>Jak poszło?</h2>
+      <div id="rates" class="rates">
+        <button type="button" class="rate rate-again" data-rating="again">Nie pamiętam<small id="preview-again"></small></button>
+        <button type="button" class="rate rate-partial" data-rating="partial">Częściowo<small id="preview-partial"></small></button>
+        <button type="button" class="rate rate-good" data-rating="good">Dobrze pamiętam<small id="preview-good"></small></button>
+      </div>
+      <div id="rated" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 10px; background: var(--raised)" hidden>
+        <span id="rated-text" style="font-size: 14px; color: var(--text-2)"></span>
+        <button type="button" id="next" class="btn btn-primary" style="font-size: 14px">Następne zadanie →</button>
+        <a id="back" class="btn btn-primary" style="font-size: 14px" href="/list.html" hidden>Wróć do listy</a>
+      </div>
+    </div>
+
+    <p id="error" class="banner banner-bad" hidden></p>
+  </section>
+</main>
+
+<script src="/vendor/marked.umd.js"></script>
+<script src="/vendor/monaco/vs/loader.js"></script>
+<script>
+var params = new URLSearchParams(location.search);
+var session = params.get("session");            // python | csharp | all | null
+var singleId = params.get("id");
+var queue = [];                                  // id zadań w tej sesji
+var position = 0;                                // które zadanie z kolejki jest teraz
+var task = null;                                 // bieżące zadanie z API
+var editor = null;
+var hintUsed = false;
+var solutionUsed = false;
+var lastRun = null;                              // {passed, total} z ostatniego uruchomienia testów
+var reviewedCount = 0;                           // ile zadań oceniono w tej sesji
+var LANG_NAME = { python: "Python", csharp: "C#" };
+var RATING_NAME = { again: "Nie pamiętam", partial: "Częściowo", good: "Dobrze pamiętam" };
+
+function inDays(n) {
+  return n <= 0 ? "dziś" : n === 1 ? "jutro" : "za " + n + " dni";
+}
+
+function showError(text) {
+  var box = document.getElementById("error");
+  box.textContent = text;
+  box.hidden = false;
+}
+
+// Pobiera kolejne zadanie z kolejki; usunięte w międzyczasie (404) pomija
+function loadCurrent() {
+  if (position >= queue.length) {
+    document.getElementById("task-area").hidden = true;
+    document.getElementById("finished").hidden = false;
+    document.getElementById("session-bar").hidden = true;
+    document.getElementById("plain-nav").hidden = false;
+    document.getElementById("finished-text").textContent = queue.length === 0
+      ? "Nie masz nic do powtórki w tej sesji."
+      : "Powtórzone zadania: " + reviewedCount + ". Następne powtórki zobaczysz na ekranie Start.";
+    return;
+  }
+  fetch("/api/tasks/" + queue[position])
+    .then(function (res) {
+      if (res.status === 404) { position++; loadCurrent(); return null; }
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    })
+    .then(function (data) { if (data) showTask(data); })
+    .catch(function (err) { showError("Nie udało się pobrać zadania (" + err.message + ")."); });
+}
+
+function showTask(data) {
+  task = data;
+  hintUsed = false;
+  solutionUsed = false;
+  lastRun = null;
+  document.getElementById("finished").hidden = true;
+  document.getElementById("task-area").hidden = false;
+  document.getElementById("error").hidden = true;
+  document.title = "LeetRepeat — " + task.title;
+
+  if (session) {
+    document.getElementById("progress-text").textContent = (position + 1) + " / " + queue.length;
+    document.getElementById("progress-fill").style.width = Math.round((position + 1) / queue.length * 100) + "%";
+  }
+
+  var chipLang = document.getElementById("chip-lang");
+  chipLang.className = "chip chip-" + task.language;
+  chipLang.textContent = LANG_NAME[task.language];
+  document.getElementById("chip-kind").textContent = task.kind;
+
+  var chipLast = document.getElementById("chip-last");
+  chipLast.hidden = !task.last_reviewed_at;
+  if (task.last_reviewed_at) {
+    var now = new Date();
+    var todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var d = new Date(task.last_reviewed_at);
+    var reviewedMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    var ago = Math.round((todayMidnight - reviewedMidnight) / 86400000);
+    chipLast.textContent = "ostatnio: " + (ago <= 0 ? "dziś" : ago === 1 ? "wczoraj" : ago + " dni temu");
+  }
+
+  document.getElementById("title").textContent = task.title;
+  document.getElementById("description").innerHTML = marked.parse(task.description);
+
+  document.getElementById("hint-box").textContent = task.hint || "Brak podpowiedzi dla tego zadania.";
+  document.getElementById("hint-box").hidden = true;
+  document.getElementById("hint-state").textContent = "pokaż";
+  document.getElementById("solution-box").textContent = task.solution;
+  document.getElementById("solution-box").hidden = true;
+  document.getElementById("solution-state").textContent = "pokaż";
+
+  document.getElementById("file-name").textContent = task.language === "python" ? "rozwiazanie.py" : "Rozwiazanie.cs";
+  monaco.editor.setModelLanguage(editor.getModel(), task.language);
+  editor.setValue(task.starter_code);
+
+  document.getElementById("results").innerHTML = "";
+  document.getElementById("results-empty").hidden = false;
+  document.getElementById("results-count").textContent = "";
+  document.getElementById("run-info").textContent = "";
+
+  ["again", "partial", "good"].forEach(function (r) {
+    document.getElementById("preview-" + r).textContent = inDays(task.preview[r]);
+  });
+  document.getElementById("rates").hidden = false;
+  document.getElementById("rated").hidden = true;
+  window.scrollTo(0, 0);
+}
+
+// --- Podpowiedź i rozwiązanie (rozwijane) ---
+document.getElementById("hint-toggle").addEventListener("click", function () {
+  var box = document.getElementById("hint-box");
+  box.hidden = !box.hidden;
+  if (!box.hidden) hintUsed = true;
+  document.getElementById("hint-state").textContent = box.hidden ? "pokaż" : "ukryj";
+});
+document.getElementById("solution-toggle").addEventListener("click", function () {
+  var box = document.getElementById("solution-box");
+  box.hidden = !box.hidden;
+  if (!box.hidden) solutionUsed = true;
+  document.getElementById("solution-state").textContent = box.hidden ? "pokaż" : "ukryj";
+});
+
+document.getElementById("reset").addEventListener("click", function () {
+  editor.setValue(task.starter_code);
+});
+
+// --- Uruchamianie testów ---
+document.getElementById("run").addEventListener("click", function () {
+  var button = document.getElementById("run");
+  button.disabled = true;
+  document.getElementById("run-label").textContent = "Uruchamiam…";
+  document.getElementById("run-info").textContent =
+    task.language === "csharp" ? "pierwsze uruchomienie C# trwa kilka sekund" : "";
+  var started = performance.now();
+  fetch("/api/run", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ language: task.language, kind: task.kind, code: editor.getValue(), tests: task.tests })
+  })
+    .then(function (res) {
+      return res.json().then(function (data) {
+        if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : "HTTP " + res.status);
+        return data;
+      });
+    })
+    .then(function (data) {
+      var seconds = ((performance.now() - started) / 1000).toFixed(1).replace(".", ",");
+      document.getElementById("run-info").textContent = LANG_NAME[task.language] + " · " + seconds + " s";
+      var results = data.results;
+      var passed = results.filter(function (r) { return r.status === "pass"; }).length;
+      lastRun = { passed: passed, total: results.length };
+      var count = document.getElementById("results-count");
+      count.textContent = passed + " / " + results.length + " zaliczone";
+      count.style.color = passed === results.length ? "var(--green)" : "var(--red)";
+      document.getElementById("results-empty").hidden = true;
+
+      var list = document.getElementById("results");
+      list.innerHTML = "";
+      results.forEach(function (r) {
+        var box = document.createElement("div");
+        box.className = "result result-" + r.status;
+        var label = { pass: "✓ OK", fail: "✗ BŁĄD", error: "💥 WYJĄTEK", timeout: "⏱ CZAS" }[r.status];
+        box.innerHTML = '<div class="result-row"><span class="result-label"></span><span class="in"></span><span class="out" style="color: var(--subtle)"></span></div>';
+        box.querySelector(".result-label").textContent = label;
+        box.querySelector(".in").textContent = r.input === "" ? "(puste wejście)" : r.input;
+        if (r.status === "pass") {
+          box.querySelector(".out").textContent = "→ " + r.actual;
+        } else if (r.status === "fail") {
+          var d = document.createElement("div");
+          d.className = "result-detail";
+          d.innerHTML = 'oczekiwano <span class="ok-text"></span> · otrzymano <span class="bad-text"></span>';
+          d.querySelector(".ok-text").textContent = r.expected;
+          d.querySelector(".bad-text").textContent = r.actual === "" ? "(nic)" : r.actual;
+          box.appendChild(d);
+        } else {
+          var m = document.createElement("div");
+          m.className = "result-detail";
+          m.innerHTML = "<pre></pre>";
+          m.querySelector("pre").textContent = r.message || "";
+          box.appendChild(m);
+        }
+        list.appendChild(box);
+      });
+    })
+    .catch(function (err) { showError(err.message); document.getElementById("run-info").textContent = ""; })
+    .finally(function () {
+      button.disabled = false;
+      document.getElementById("run-label").textContent = "Uruchom testy";
+    });
+});
+
+// --- Ocena ---
+document.querySelectorAll("#rates button").forEach(function (button) {
+  button.addEventListener("click", function () {
+    var rating = button.dataset.rating;
+    fetch("/api/tasks/" + task.id + "/review", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        rating: rating,
+        tests_passed: lastRun ? lastRun.passed : null,
+        tests_total: lastRun ? lastRun.total : null,
+        hint_used: hintUsed,
+        solution_used: solutionUsed
+      })
+    })
+      .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .then(function (data) {
+        var parts = data.due_date.split("-");
+        var due = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        var now = new Date();
+        var days = Math.round((due - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 86400000);
+        document.getElementById("rated-text").innerHTML = "Zapisano: <strong></strong> · następna powtórka <span></span>";
+        document.querySelector("#rated-text strong").textContent = RATING_NAME[rating];
+        document.querySelector("#rated-text span").textContent = inDays(days);
+        reviewedCount++;
+        document.getElementById("rates").hidden = true;
+        document.getElementById("rated").hidden = false;
+        var last = position + 1 >= queue.length;
+        document.getElementById("next").hidden = !session;
+        document.getElementById("next").textContent = last ? "Zakończ sesję →" : "Następne zadanie →";
+        document.getElementById("back").hidden = !!session;
+      })
+      .catch(function (err) { showError("Nie udało się zapisać oceny (" + err.message + ")."); });
+  });
+});
+
+document.getElementById("next").addEventListener("click", function () {
+  position++;
+  loadCurrent();
+});
+
+// --- Start: edytor Monaco, potem kolejka sesji albo jedno zadanie ---
+require.config({ paths: { vs: "/vendor/monaco/vs" } });
+require(["vs/editor/editor.main"], function () {
+  editor = monaco.editor.create(document.getElementById("editor"), {
+    value: "", language: "python", theme: lrIsDark() ? "vs-dark" : "vs", automaticLayout: true,
+    minimap: { enabled: false }, fontSize: 14, scrollBeyondLastLine: false, tabSize: 4
+  });
+  window.addEventListener("themechange", function (e) {
+    monaco.editor.setTheme(e.detail === "ciemny" ? "vs-dark" : "vs");
+  });
+
+  if (session) {
+    document.getElementById("session-bar").hidden = false;
+    document.getElementById("session-label").textContent =
+      "Sesja: " + (session === "all" ? "wszystkie języki" : LANG_NAME[session] || session);
+    var url = "/api/review/due" + (session === "python" || session === "csharp" ? "?language=" + session : "");
+    fetch(url)
+      .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .then(function (ids) { queue = ids; position = 0; loadCurrent(); })
+      .catch(function (err) { showError("Nie udało się pobrać listy powtórek (" + err.message + ")."); });
+  } else if (singleId) {
+    document.getElementById("plain-nav").hidden = false;
+    queue = [Number(singleId)];
+    position = 0;
+    loadCurrent();
+  } else {
+    location.href = "/";
+  }
+});
+</script>
+</body>
+</html>
