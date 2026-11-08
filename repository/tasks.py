@@ -99,15 +99,16 @@ def count_tasks(db_path, language, today):
     return due, total
 
 
-def save_review(db_path, task_id, review, interval_days, due_date, reviewed_at):
-    """Zapisuje nowy termin zadania i wpis w historii ocen (jedna transakcja)."""
+def save_review(db_path, task_id, review, interval_days, due_date, reviewed_at, prev_interval_days, prev_due_date):
+    """Zapisuje nowy termin zadania i wpis w historii ocen (jedna transakcja).
+    prev_*: termin sprzed oceny — potrzebny, żeby dało się ją cofnąć."""
     con = connect(db_path)
     with con:
         con.execute("UPDATE tasks SET interval_days = ?, due_date = ? WHERE id = ?",
                     (interval_days, due_date, task_id))
         con.execute(
             "INSERT INTO reviews (task_id, rating, reviewed_at, tests_passed, tests_total, hint_used,"
-            " solution_used) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            " solution_used, prev_interval_days, prev_due_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (task_id, review["rating"], reviewed_at, review["tests_passed"], review["tests_total"],
-             int(review["hint_used"]), int(review["solution_used"])))
+             int(review["hint_used"]), int(review["solution_used"]), prev_interval_days, prev_due_date))
     con.close()

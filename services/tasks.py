@@ -46,5 +46,6 @@ def review_task(db_path, task_id, review):
     if task is None:
         return None
     new_interval, due = next_review(task["interval_days"], review["rating"], today())
-    repo.save_review(db_path, task_id, review, new_interval, due.isoformat(), now())
+    repo.save_review(db_path, task_id, review, new_interval, due.isoformat(), now(),
+                     task["interval_days"], task["due_date"])
     return {"interval_days": new_interval, "due_date": due.isoformat()}

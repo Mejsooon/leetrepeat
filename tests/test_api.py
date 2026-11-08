@@ -134,3 +134,10 @@ def test_rejects_foreign_host(client):                  # przegląd: Important 3
                             "tests": [{"input": "", "expected": "1"}]})
     assert res.status_code == 400
     assert client.get("/api/summary", headers={"Host": "localhost:8000"}).status_code == 200
+
+
+def test_review_stores_previous_state(client, task_body, fixed_today, db_path):
+    task_id = client.post("/api/tasks", json=task_body).json()["id"]
+    client.post(f"/api/tasks/{task_id}/review", json={"rating": "good"})
+    row = connect(db_path).execute("SELECT prev_interval_days, prev_due_date FROM reviews").fetchone()
+    assert row["prev_interval_days"] == 0 and row["prev_due_date"] == "2026-11-08"

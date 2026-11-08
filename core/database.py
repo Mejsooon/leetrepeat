@@ -32,7 +32,9 @@ CREATE TABLE IF NOT EXISTS reviews (
     tests_passed  INTEGER,
     tests_total   INTEGER,
     hint_used     INTEGER NOT NULL,
-    solution_used INTEGER NOT NULL
+    solution_used INTEGER NOT NULL,
+    prev_interval_days REAL,                  -- stan zadania sprzed oceny (do cofnięcia)
+    prev_due_date      TEXT
 );
 """
 
@@ -42,4 +44,10 @@ def connect(path: str) -> sqlite3.Connection:
     con.row_factory = sqlite3.Row                 # wiersze dostępne po nazwie kolumny
     con.execute("PRAGMA foreign_keys = ON")       # bez tego ON DELETE CASCADE nie działa
     con.executescript(SCHEMA)
+    # Migracja baz z v1: dopisujemy kolumny, których jeszcze nie ma
+    columns = [row["name"] for row in con.execute("PRAGMA table_info(reviews)")]
+    if "prev_interval_days" not in columns:
+        con.execute("ALTER TABLE reviews ADD COLUMN prev_interval_days REAL")
+    if "prev_due_date" not in columns:
+        con.execute("ALTER TABLE reviews ADD COLUMN prev_due_date TEXT")
     return con
