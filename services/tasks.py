@@ -49,3 +49,10 @@ def review_task(db_path, task_id, review):
     repo.save_review(db_path, task_id, review, new_interval, due.isoformat(), now(),
                      task["interval_days"], task["due_date"])
     return {"interval_days": new_interval, "due_date": due.isoformat()}
+
+
+def undo_review(db_path, task_id):
+    """Cofa najnowszą ocenę. Zwraca "missing" (brak zadania), None (nie da się cofnąć) albo nowy stan."""
+    if repo.get_task(db_path, task_id) is None:
+        return "missing"
+    return repo.undo_last_review(db_path, task_id)

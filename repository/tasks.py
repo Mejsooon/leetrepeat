@@ -112,3 +112,20 @@ def save_review(db_path, task_id, review, interval_days, due_date, reviewed_at, 
             (task_id, review["rating"], reviewed_at, review["tests_passed"], review["tests_total"],
              int(review["hint_used"]), int(review["solution_used"]), prev_interval_days, prev_due_date))
     con.close()
+
+
+def undo_last_review(db_path, task_id):
+    """Usuwa najnowszą ocenę zadania i przywraca termin sprzed niej.
+    Zwraca {interval_days, due_date} albo None, gdy nie ma czego cofnąć (brak ocen lub stara ocena bez prev_*)."""
+    con = connect(db_path)
+    last = con.execute("SELECT id, prev_interval_days, prev_due_date FROM reviews WHERE task_id = ?"
+                       " ORDER BY reviewed_at DESC, id DESC LIMIT 1", (task_id,)).fetchone()
+    if last is None or last["prev_interval_days"] is None or last["prev_due_date"] is None:
+        con.close()
+        return None
+    with con:
+        con.execute("DELETE FROM reviews WHERE id = ?", (last["id"],))
+        con.execute("UPDATE tasks SET interval_days = ?, due_date = ? WHERE id = ?",
+                    (last["prev_interval_days"], last["prev_due_date"], task_id))
+    con.close()
+    return {"interval_days": last["prev_interval_days"], "due_date": last["prev_due_date"]}

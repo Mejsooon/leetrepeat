@@ -54,6 +54,15 @@ def create_router(db_path):
             raise HTTPException(404, NOT_FOUND)
         return result
 
+    @router.post("/tasks/{task_id}/review/undo")
+    def undo_review(task_id: int):
+        result = service.undo_review(db_path, task_id)
+        if result == "missing":
+            raise HTTPException(404, NOT_FOUND)
+        if result is None:
+            raise HTTPException(409, "Tej oceny nie da się cofnąć")
+        return result
+
     @router.post("/run")
     def run(body: RunIn):
         # Zwykła funkcja (nie async): FastAPI uruchamia ją w osobnym wątku, więc serwer się nie blokuje

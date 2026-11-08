@@ -141,3 +141,42 @@ def test_review_stores_previous_state(client, task_body, fixed_today, db_path):
     client.post(f"/api/tasks/{task_id}/review", json={"rating": "good"})
     row = connect(db_path).execute("SELECT prev_interval_days, prev_due_date FROM reviews").fetchone()
     assert row["prev_interval_days"] == 0 and row["prev_due_date"] == "2026-11-08"
+
+
+def test_undo_restores_previous_state(client, task_body, fixed_today, db_path):
+    task_id = client.post("/api/tasks", json=task_body).json()["id"]
+    client.post(f"/api/tasks/{task_id}/review", json={"rating": "good"})
+    res = client.post(f"/api/tasks/{task_id}/review/undo")
+    assert res.status_code == 200 and res.json() == {"interval_days": 0, "due_date": "2026-11-08"}
+    task = client.get(f"/api/tasks/{task_id}").json()
+    assert task["due_date"] == "2026-11-08" and task["last_reviewed_at"] is None
+    assert connect(db_path).execute("SELECT COUNT(*) FROM reviews").fetchone()[0] == 0
+
+
+def test_undo_only_latest(client, task_body, fixed_today, db_path):
+    task_id = client.post("/api/tasks", json=task_body).json()["id"]
+    client.post(f"/api/tasks/{task_id}/review", json={"rating": "good"})
+    client.post(f"/api/tasks/{task_id}/review", json={"rating": "again"})
+    res = client.post(f"/api/tasks/{task_id}/review/undo")
+    assert res.json()["due_date"] == "2026-11-11"
+    assert connect(db_path).execute("SELECT COUNT(*) FROM reviews").fetchone()[0] == 1
+
+
+def test_undo_without_reviews_409(client, task_body):
+    task_id = client.post("/api/tasks", json=task_body).json()["id"]
+    res = client.post(f"/api/tasks/{task_id}/review/undo")
+    assert res.status_code == 409 and res.json()["detail"] == "Tej oceny nie da się cofnąć"
+
+
+def test_undo_legacy_review_409(client, task_body, db_path):
+    task_id = client.post("/api/tasks", json=task_body).json()["id"]
+    con = connect(db_path)
+    con.execute("INSERT INTO reviews (task_id, rating, reviewed_at, hint_used, solution_used)"
+                " VALUES (?, 'good', '2026-11-01T10:00:00', 0, 0)", (task_id,))
+    con.commit()
+    assert client.post(f"/api/tasks/{task_id}/review/undo").status_code == 409
+    assert connect(db_path).execute("SELECT COUNT(*) FROM reviews").fetchone()[0] == 1
+
+
+def test_undo_missing_task_404(client):
+    assert client.post("/api/tasks/999/review/undo").status_code == 404
