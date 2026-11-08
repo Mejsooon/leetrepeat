@@ -2,8 +2,8 @@ import shutil
 
 import pytest
 
-import runner
-from runner import RuntimeMissing, run_tests
+from services import runner
+from services.runner import RuntimeMissing, run_tests
 
 needs_dotnet = pytest.mark.skipif(shutil.which("dotnet") is None, reason="brak dotnet")
 

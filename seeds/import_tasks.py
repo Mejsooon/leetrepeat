@@ -14,7 +14,7 @@ from datetime import date, datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-from db import connect  # noqa: E402
+from core.database import connect  # noqa: E402
 
 if len(sys.argv) < 2:
     print(__doc__)

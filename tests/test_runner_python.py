@@ -1,4 +1,4 @@
-from runner import run_tests
+from services.runner import run_tests
 
 REV = "def odwroc(l):\n    return l[::-1]\n"
 

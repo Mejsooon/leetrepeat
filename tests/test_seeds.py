@@ -6,8 +6,8 @@ import sys
 
 import pytest
 
-from db import connect
-from runner import run_tests
+from core.database import connect
+from services.runner import run_tests
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEED_FILES = sorted(glob.glob(os.path.join(ROOT, "seeds", "*.json")))

@@ -1,4 +1,4 @@
-from db import connect
+from core.database import connect
 
 
 def insert_task(con):

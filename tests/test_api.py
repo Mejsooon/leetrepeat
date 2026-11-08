@@ -3,10 +3,11 @@ from datetime import date
 import pytest
 from fastapi.testclient import TestClient
 
-import main
-from db import connect
+from services import runner
+from services import tasks as task_service
+from core.database import connect
 from main import create_app
-from runner import RuntimeMissing
+from services.runner import RuntimeMissing
 
 
 @pytest.fixture
@@ -31,7 +32,7 @@ def task_body():
 
 @pytest.fixture
 def fixed_today(monkeypatch):
-    monkeypatch.setattr(main, "today", lambda: date(2026, 11, 8))
+    monkeypatch.setattr(task_service, "today", lambda: date(2026, 11, 8))
 
 
 def test_create_and_get(client, task_body):
@@ -116,7 +117,7 @@ def test_run_endpoint(client):
 def test_run_missing_runtime(client, monkeypatch):
     def missing(*args):
         raise RuntimeMissing("brak")
-    monkeypatch.setattr(main, "run_tests", missing)
+    monkeypatch.setattr(runner, "run_tests", missing)
     res = client.post("/api/run", json={"language": "csharp", "kind": "program", "code": "",
                                         "tests": [{"input": "", "expected": ""}]})
     assert res.status_code == 400 and res.json()["detail"] == "brak"

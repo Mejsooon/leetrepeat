@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from scheduler import next_review, preview
+from services.scheduler import next_review, preview
 
 today = date(2026, 11, 8)
 

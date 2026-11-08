@@ -55,6 +55,8 @@ FastAPI (main.py)
 
 ### Struktura projektu
 
+> Aktualizacja 2026-11-08: kod podzielony na warstwy `api/` (routes, schemas), `services/` (tasks, scheduler, runner), `repository/` (tasks — cały SQL) i `core/` (database). Aktualny układ: README → „Struktura projektu”. Poniżej pierwotny układ v1.
+
 ```
 leetrepeat/
 ├── main.py

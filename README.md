@@ -120,6 +120,36 @@ Zadania, które już są w bazie (ten sam tytuł i język), są pomijane — imp
 - Python: 5 s na uruchomienie, C#: 20 s (pierwsza kompilacja C# trwa kilka sekund).
 - Zadania C# nie mogą używać zewnętrznych paczek NuGet (kompilacja działa offline).
 
+## Struktura projektu
+
+```
+leetrepeat/
+├── main.py               # start aplikacji: tworzy FastAPI, podpina API i frontend
+├── api/
+│   ├── routes.py         # endpointy HTTP: przyjmują dane, wołają serwis, zwracają odpowiedź
+│   └── schemas.py        # jak wyglądają dane z frontendu (walidacja Pydantic)
+├── services/
+│   ├── tasks.py          # logika zadań: "dziś", nowy termin po ocenie, podsumowanie
+│   ├── scheduler.py      # wzory powtórek (Nie pamiętam / Częściowo / Dobrze)
+│   └── runner.py         # uruchamianie kodu Python/C# i porównanie z testami
+├── repository/
+│   └── tasks.py          # cały SQL: odczyt i zapis zadań, testów, ocen
+├── core/
+│   └── database.py       # połączenie z SQLite i tworzenie tabel
+├── static/               # frontend: HTML, CSS, JS (+ Monaco w vendor/)
+├── seeds/                # gotowe zestawy zadań + skrypt importu
+└── tests/                # testy pytest
+```
+
+Przepływ jednego żądania, np. ocena zadania:
+
+```
+przeglądarka → api/routes.py → services/tasks.py → repository/tasks.py → core/database.py → leetrepeat.db
+                 (HTTP, 404)     (nowy termin)       (UPDATE + INSERT)    (połączenie)
+```
+
+Gdy dodajesz nową funkcję: SQL do `repository/`, obliczenia i decyzje do `services/`, nowy adres URL do `api/routes.py`.
+
 ## Testy aplikacji
 
 ```bash
