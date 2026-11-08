@@ -93,6 +93,20 @@ Przed zapisem kliknij **„Sprawdź rozwiązanie na testach”** — wyłapiesz 
 
 `print()` do debugowania w zadaniach typu function nie psuje testów — liczy się tylko zwrócony wynik.
 
+## Gotowe zestawy zadań
+
+W folderze `seeds/` są gotowe zadania w plikach JSON. Import do Twojej bazy (serwer może być wyłączony):
+
+```bash
+python seeds/import_tasks.py seeds/python_variables.json
+```
+
+| Plik | Zawartość |
+|---|---|
+| `python_variables.json` | 10 zadań z notatki PYTHON — VARIABLES: typy, `isinstance`, konwersje, swap, mutowalność, kopie, `is` vs `==`, nazwy zmiennych |
+
+Zadania, które już są w bazie (ten sam tytuł i język), są pomijane — import można powtarzać.
+
 ## Powtórki
 
 | Ocena | Nowe zadanie | Kolejne powtórki |
