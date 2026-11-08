@@ -28,7 +28,7 @@ def test_pages_served(client):
 
 def test_form_served(client):
     form = client.get("/form.html").text
-    assert "Nowe zadanie" in form and "Sprawdź rozwiązanie na testach" in form
+    assert "Nowe zadanie" in form and "Sprawdź rozwiązanie" in form
 
 
 def test_task_page_served(client):
@@ -53,3 +53,9 @@ def test_today_page_served(client):
 def test_library_page_served(client):
     page = client.get("/list.html").text
     assert "Biblioteka" in page and "Szukaj po tytule" in page
+
+
+def test_editor_page_served(client):
+    page = client.get("/form.html").text
+    for needle in ["Nowe zadanie", "Podgląd", "Sprawdź rozwiązanie"]:
+        assert needle in page, needle

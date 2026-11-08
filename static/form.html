@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pl" class="lr-dark">
+<html lang="pl" class="lr-light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,154 +9,195 @@
 <link rel="icon" href="data:,">
 </head>
 <body>
-<header class="lr-header">
-  <a class="lr-logo" href="/"><span class="lr-logo-mark">&lt;/&gt;</span><span class="lr-logo-name">LeetRepeat</span></a>
-  <nav class="lr-nav">
-    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Przełącz tryb jasny / ciemny"></button>
-    <a href="/">Start</a>
-    <a href="/list.html">Wszystkie zadania</a>
-    <a href="/form.html" class="lr-nav-add">+ Dodaj zadanie</a>
-  </nav>
+<header class="bar">
+  <div class="container bar-inner">
+    <a class="logo" href="/">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="7" y="3" width="17" height="20" rx="4" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"></rect><rect x="3" y="6" width="17" height="20" rx="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.5"></rect><path d="M9 13l-2.5 2.5L9 18M14 13l2.5 2.5L14 18" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span>LeetRepeat</span>
+    </a>
+    <nav class="nav" aria-label="Główna">
+      <a class="nav-link" href="/">Dziś</a>
+      <a class="nav-link" href="/list.html">Biblioteka</a>
+      <a class="btn primary" href="/form.html" style="min-height: 40px; margin-left: 8px">Nowe zadanie</a>
+      <button type="button" id="theme-toggle" class="btn quiet icon" aria-label="Przełącz tryb jasny lub ciemny"></button>
+    </nav>
+  </div>
 </header>
 
-<main class="page page-narrow" style="padding-bottom: 56px">
-  <h1 id="heading" style="font-size: 32px">Nowe zadanie</h1>
-
-  <div class="field">
-    <label for="title">Tytuł</label>
-    <input id="title" class="input" type="text" placeholder="np. Odwróć listę">
-    <span class="field-error" id="err-title" hidden></span>
+<main class="container" style="padding-top: 48px; padding-bottom: 40px; display: flex; flex-direction: column; gap: 36px">
+  <div style="display: flex; flex-direction: column; gap: 8px">
+    <h1 id="heading" style="font-size: 44px; line-height: 1.05; letter-spacing: -0.03em; font-weight: 700">Nowe zadanie</h1>
+    <p style="font-size: 16px; color: var(--ink-2); max-width: 60ch">Opisz zadanie, napisz rozwiązanie i testy. Przed zapisem sprawdź, czy rozwiązanie przechodzi wszystkie testy.</p>
   </div>
 
-  <div style="display: flex; flex-wrap: wrap; gap: 24px">
-    <div class="field">
-      <span class="label">Język</span>
-      <div class="seg" role="group" aria-label="Język" id="seg-language">
-        <button type="button" data-value="python" class="on">Python</button>
-        <button type="button" data-value="csharp">C#</button>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: 32px; align-items: start">
+    <section aria-labelledby="sec-opis" class="card" style="padding: 28px; display: flex; flex-direction: column; gap: 22px">
+      <h2 id="sec-opis" style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em">Opis</h2>
+      <div class="field">
+        <label for="title">Tytuł</label>
+        <input id="title" class="input" type="text" placeholder="np. Odwróć listę">
+        <span class="field-error" id="err-title" hidden></span>
       </div>
-    </div>
-    <div class="field">
-      <span class="label">Typ zadania</span>
-      <div class="seg" role="group" aria-label="Typ zadania" id="seg-kind">
-        <button type="button" data-value="function" class="on">function — wywołanie funkcji</button>
-        <button type="button" data-value="program">program — wejście / wyjście</button>
+      <div style="display: flex; flex-wrap: wrap; gap: 20px">
+        <div class="field">
+          <span class="label">Język</span>
+          <div role="group" aria-label="Język" class="seg" id="seg-language">
+            <button type="button" data-value="python" class="on">Python</button>
+            <button type="button" data-value="csharp">C#</button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label">Rodzaj</span>
+          <div role="group" aria-label="Rodzaj zadania" class="seg" id="seg-kind">
+            <button type="button" data-value="function" class="on">Funkcja</button>
+            <button type="button" data-value="program">Program</button>
+          </div>
+        </div>
       </div>
-    </div>
+      <p id="kind-help" class="help" style="margin-top: -10px; font-size: 14px"></p>
+      <div class="field">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+          <label for="description">Treść</label>
+          <div role="group" aria-label="Widok treści" class="seg small" id="seg-view">
+            <button type="button" data-value="write" class="on">Pisz</button>
+            <button type="button" data-value="preview">Podgląd</button>
+          </div>
+        </div>
+        <textarea id="description" class="input" rows="6" placeholder="Co ma zostać zrobione? Możesz używać `kodu`, **pogrubienia** i list."></textarea>
+        <div id="preview" class="prose" style="min-height: 150px; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); font-size: 15px; max-width: none" hidden></div>
+        <span class="help" id="markdown-help">Możesz używać Markdown: `kod`, **pogrubienie**, listy.</span>
+        <span class="field-error" id="err-description" hidden></span>
+      </div>
+      <div class="field">
+        <label for="hint">Podpowiedź</label>
+        <textarea id="hint" class="input" rows="3"></textarea>
+      </div>
+    </section>
+
+    <section aria-labelledby="sec-kod" class="card" style="padding: 28px; display: flex; flex-direction: column; gap: 22px">
+      <h2 id="sec-kod" style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em">Kod</h2>
+      <div class="field">
+        <span class="label">Kod startowy</span>
+        <div class="editor-box" style="box-shadow: none">
+          <div class="editor-head" style="padding: 8px 14px"><span class="file code" id="starter-file">rozwiazanie.py</span></div>
+          <div id="starter-editor" class="editor small"></div>
+        </div>
+      </div>
+      <div class="field">
+        <span class="label">Rozwiązanie wzorcowe</span>
+        <div class="editor-box" style="box-shadow: none">
+          <div class="editor-head" style="padding: 8px 14px"><span class="file code" id="solution-file">wzorzec.py</span></div>
+          <div id="solution-editor" class="editor small" style="height: 220px"></div>
+        </div>
+        <span class="field-error" id="err-solution" hidden></span>
+      </div>
+    </section>
   </div>
 
-  <div class="field">
-    <label for="description">Treść <span style="color: var(--subtle); font-weight: 400">(Markdown)</span></label>
-    <textarea id="description" class="textarea" rows="5" placeholder="Co ma zostać zrobione? Możesz używać `kodu` i **pogrubienia**."></textarea>
-    <span class="field-error" id="err-description" hidden></span>
-  </div>
-
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px">
-    <div class="field">
-      <span class="label">Kod startowy</span>
-      <div id="starter-editor" class="editor-small"></div>
+  <section aria-labelledby="sec-testy" class="card" style="padding: 28px; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px">
+      <h2 id="sec-testy" style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em">Testy</h2>
+      <p id="test-help" class="help" style="font-size: 14px"></p>
     </div>
-    <div class="field">
-      <label for="hint">Podpowiedź</label>
-      <textarea id="hint" class="textarea" rows="6"></textarea>
-    </div>
-  </div>
-
-  <div class="field">
-    <span class="label">Rozwiązanie wzorcowe</span>
-    <div id="solution-editor" class="editor-small" style="height: 200px"></div>
-    <span class="field-error" id="err-solution" hidden></span>
-  </div>
-
-  <section class="card" style="padding: 20px; gap: 14px">
-    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
-      <h2 style="font-size: 16px">Testy</h2>
-      <span id="test-help" class="muted" style="font-size: 13px"></span>
-    </div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr 44px; gap: 10px; color: var(--subtle); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em">
-      <span id="col-input"></span><span id="col-expected"></span><span></span>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 44px 28px; gap: 10px; font-size: 13px; font-weight: 600; color: var(--muted); padding: 0 2px">
+      <span id="col-input"></span><span id="col-expected"></span><span></span><span></span>
     </div>
     <div id="test-rows" style="display: flex; flex-direction: column; gap: 10px"></div>
-    <button type="button" id="add-test" class="btn btn-dashed" style="align-self: flex-start">+ dodaj test</button>
+    <button type="button" id="add-test" class="btn quiet" style="align-self: flex-start; color: var(--accent)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+      Dodaj test
+    </button>
     <span class="field-error" id="err-tests" hidden></span>
-    <div id="check-output" style="display: flex; flex-direction: column; gap: 10px"></div>
   </section>
 
-  <p id="error" class="banner banner-bad" hidden></p>
-
-  <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end">
-    <a href="/list.html" class="btn btn-ghost" style="border: none">Anuluj</a>
-    <button type="button" id="check" class="btn btn-check">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
-      <span id="check-label">Sprawdź rozwiązanie na testach</span>
-    </button>
-    <button type="button" id="save" class="btn btn-primary">Zapisz zadanie</button>
-  </div>
+  <p id="error" class="banner error" hidden></p>
 </main>
 
+<div class="bar bottom">
+  <div class="container bar-inner" style="padding-top: 14px; padding-bottom: 14px">
+    <p id="status" aria-live="polite" style="flex: 1 1 260px; font-size: 15px; color: var(--muted)">Sprawdź rozwiązanie przed zapisem.</p>
+    <a href="/list.html" class="btn quiet">Anuluj</a>
+    <button type="button" id="check" class="btn">Sprawdź rozwiązanie</button>
+    <button type="button" id="save" class="btn primary" style="padding: 0 24px">Zapisz zadanie</button>
+  </div>
+</div>
+
+<script src="/vendor/marked.umd.js"></script>
 <script src="/vendor/monaco/vs/loader.js"></script>
 <script>
-var params = new URLSearchParams(location.search);
-var editId = params.get("id");
+var editId = new URLSearchParams(location.search).get("id");
 var language = "python";
 var kind = "function";
 var starterEditor = null;
 var solutionEditor = null;
-var MONACO_LANG = { python: "python", csharp: "csharp" };
+var TRASH = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>';
 
-// --- Przełączniki segmentowe (język, typ) ---
 function setSeg(groupId, value) {
   document.querySelectorAll("#" + groupId + " button").forEach(function (b) {
     b.classList.toggle("on", b.dataset.value === value);
   });
 }
 
-// --- Wiersze testów: dla "program" wejście może mieć kilka linii, więc jest textarea ---
+function setStatus(text, color, bold) {
+  var status = document.getElementById("status");
+  status.textContent = text;
+  status.style.color = color;
+  status.style.fontWeight = bold ? "600" : "400";
+}
+
+// Zmiana kodu albo testów unieważnia poprzednie sprawdzenie
+function clearCheck() {
+  document.querySelectorAll(".test-row .mark").forEach(function (m) { m.innerHTML = ""; m.removeAttribute("aria-label"); });
+  document.querySelectorAll(".test-row .row-detail").forEach(function (d) { d.hidden = true; });
+  setStatus("Sprawdź rozwiązanie przed zapisem.", "var(--muted)", false);
+}
+
+// --- Wiersze testów (dla programu wejście może mieć kilka linii, więc textarea) ---
 function addTestRow(inputValue, expectedValue) {
   var row = document.createElement("div");
   row.className = "test-row";
-  row.style.cssText = "display: grid; grid-template-columns: 1fr 1fr 44px; gap: 10px; align-items: start";
-  var input = document.createElement(kind === "program" ? "textarea" : "input");
-  var expected = document.createElement(kind === "program" ? "textarea" : "input");
-  [input, expected].forEach(function (el) {
-    el.className = (kind === "program" ? "textarea" : "input") + " mono";
-    if (kind === "program") el.rows = 2;
-  });
-  input.setAttribute("aria-label", "Wejście testu");
-  expected.setAttribute("aria-label", "Oczekiwany wynik");
-  input.value = inputValue || "";
-  expected.value = expectedValue || "";
-  var remove = document.createElement("button");
-  remove.type = "button";
-  remove.className = "btn btn-icon";
-  remove.style.cssText = "width: 44px; height: 42px; min-height: 42px; border: 1px solid var(--input-border)";
-  remove.setAttribute("aria-label", "Usuń test");
-  remove.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>';
-  remove.addEventListener("click", function () { row.remove(); });
-  row.appendChild(input);
-  row.appendChild(expected);
-  row.appendChild(remove);
+  row.style.cssText = "display: flex; flex-direction: column; gap: 6px";
+  var tag = kind === "program" ? "textarea" : "input";
+  row.innerHTML =
+    '<div style="display: grid; grid-template-columns: 1fr 1fr 44px 28px; gap: 10px; align-items: center">' +
+    "<" + tag + ' class="input code" aria-label="Wejście testu"' + (tag === "textarea" ? ' rows="2"></textarea>' : ">") +
+    "<" + tag + ' class="input code" aria-label="Oczekiwany wynik"' + (tag === "textarea" ? ' rows="2"></textarea>' : ">") +
+    '<button type="button" class="btn quiet icon" aria-label="Usuń test" style="color: var(--muted)">' + TRASH + "</button>" +
+    '<span class="mark" style="width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700"></span>' +
+    "</div>" +
+    '<p class="row-detail" style="font-size: 13px; color: var(--forgot); padding-left: 2px; overflow-wrap: anywhere; white-space: pre-wrap" hidden></p>';
+  var fields = row.querySelectorAll("input, textarea");
+  fields[0].value = inputValue || "";
+  fields[1].value = expectedValue || "";
+  fields[0].addEventListener("input", clearCheck);
+  fields[1].addEventListener("input", clearCheck);
+  row.querySelector("button").addEventListener("click", function () { row.remove(); clearCheck(); });
   document.getElementById("test-rows").appendChild(row);
 }
 
+// Testy z niepustych wierszy (oba pola puste = wiersz pomijany) + same wiersze, żeby pokazać wyniki
 function readTests() {
   var tests = [];
+  var rows = [];
   document.querySelectorAll(".test-row").forEach(function (row) {
     var fields = row.querySelectorAll("input, textarea");
-    // Wiersz z dwoma pustymi polami pomijamy
     if (fields[0].value === "" && fields[1].value === "") return;
     tests.push({ input: fields[0].value, expected: fields[1].value });
+    rows.push(row);
   });
-  return tests;
+  return { tests: tests, rows: rows };
 }
 
-function applyKindLabels() {
+function applyKind() {
   var fn = kind === "function";
-  document.getElementById("col-input").textContent = fn ? "Wywołanie funkcji" : "Wejście (stdin)";
-  document.getElementById("col-expected").textContent = fn ? "Oczekiwany wynik (JSON)" : "Oczekiwane wyjście (stdout)";
+  document.getElementById("kind-help").textContent = fn
+    ? "Funkcja: testy wywołują Twoją funkcję i porównują zwrócony wynik."
+    : "Program: test podaje tekst na wejście i porównuje to, co program wypisze.";
+  document.getElementById("col-input").textContent = fn ? "Wywołanie" : "Wejście";
+  document.getElementById("col-expected").textContent = fn ? "Oczekiwany wynik" : "Oczekiwane wyjście";
   document.getElementById("test-help").textContent = fn
-    ? "Wynik porównywany jako JSON — [3, 2, 1] = [3,2,1]"
-    : "Porównanie tekstu, bez spacji i pustych linii na końcu";
+    ? "Wynik porównujemy jako JSON, więc spacje w [3, 2, 1] nie mają znaczenia."
+    : "Spacje i puste linie na końcu wyjścia są pomijane.";
   // Przebudowanie wierszy z zachowaniem wpisanych wartości (zmienia się input ↔ textarea)
   var current = [];
   document.querySelectorAll(".test-row").forEach(function (row) {
@@ -168,113 +209,104 @@ function applyKindLabels() {
   current.forEach(function (pair) { addTestRow(pair[0], pair[1]); });
 }
 
+function applyLanguage() {
+  var py = language === "python";
+  document.getElementById("starter-file").textContent = py ? "rozwiazanie.py" : "Rozwiazanie.cs";
+  document.getElementById("solution-file").textContent = py ? "wzorzec.py" : "Wzorzec.cs";
+  if (starterEditor) {
+    monaco.editor.setModelLanguage(starterEditor.getModel(), language);
+    monaco.editor.setModelLanguage(solutionEditor.getModel(), language);
+  }
+}
+
 document.querySelectorAll("#seg-language button").forEach(function (b) {
   b.addEventListener("click", function () {
     language = b.dataset.value;
     setSeg("seg-language", language);
-    if (starterEditor) {
-      monaco.editor.setModelLanguage(starterEditor.getModel(), MONACO_LANG[language]);
-      monaco.editor.setModelLanguage(solutionEditor.getModel(), MONACO_LANG[language]);
-    }
+    applyLanguage();
+    clearCheck();
   });
 });
 document.querySelectorAll("#seg-kind button").forEach(function (b) {
   b.addEventListener("click", function () {
     kind = b.dataset.value;
     setSeg("seg-kind", kind);
-    applyKindLabels();
+    applyKind();
+    clearCheck();
+  });
+});
+// Pisz / Podgląd (F6)
+document.querySelectorAll("#seg-view button").forEach(function (b) {
+  b.addEventListener("click", function () {
+    var preview = b.dataset.value === "preview";
+    setSeg("seg-view", b.dataset.value);
+    var text = document.getElementById("description").value;
+    document.getElementById("preview").innerHTML = text.trim()
+      ? marked.parse(text)
+      : '<p style="color: var(--muted)">Brak treści do podglądu.</p>';
+    document.getElementById("preview").hidden = !preview;
+    document.getElementById("description").hidden = preview;
+    document.getElementById("markdown-help").hidden = preview;
   });
 });
 document.getElementById("add-test").addEventListener("click", function () { addTestRow("", ""); });
 
-// Odmiana: 1 test, 2–4 testy, 5+ testów
-function testow(n) {
-  if (n === 1) return "test";
-  if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) return "testy";
-  return "testów";
-}
-
-// --- Wyniki sprawdzenia (ten sam wygląd co na ekranie zadania) ---
-function renderResults(container, results) {
-  container.innerHTML = "";
-  var passed = results.filter(function (r) { return r.status === "pass"; }).length;
-  if (passed === results.length) {
-    var ok = document.createElement("div");
-    ok.className = "banner banner-ok";
-    ok.textContent = "✓ Rozwiązanie wzorcowe przechodzi " + passed + " / " + results.length + " " + testow(results.length) + " — można zapisywać.";
-    container.appendChild(ok);
-    return;
-  }
-  var bad = document.createElement("div");
-  bad.className = "banner banner-bad";
-  bad.textContent = "Rozwiązanie wzorcowe przechodzi " + passed + " / " + results.length + " " +
-    testow(results.length) + ". Sprawdź rozwiązanie albo pola expected.";
-  container.appendChild(bad);
-  var list = document.createElement("div");
-  list.className = "results";
-  results.forEach(function (r) {
-    var box = document.createElement("div");
-    box.className = "result result-" + r.status;
-    var label = { pass: "✓ OK", fail: "✗ BŁĄD", error: "💥 WYJĄTEK", timeout: "⏱ CZAS" }[r.status];
-    box.innerHTML = '<div class="result-row"><span class="result-label"></span><span class="in"></span></div>';
-    box.querySelector(".result-label").textContent = label;
-    box.querySelector(".in").textContent = r.input === "" ? "(puste wejście)" : r.input;
-    if (r.status === "fail") {
-      var d = document.createElement("div");
-      d.className = "result-detail";
-      d.innerHTML = 'oczekiwano <span class="ok-text"></span> · otrzymano <span class="bad-text"></span>';
-      d.querySelector(".ok-text").textContent = r.expected;
-      d.querySelector(".bad-text").textContent = r.actual;
-      box.appendChild(d);
-    } else if (r.status !== "pass") {
-      var m = document.createElement("div");
-      m.className = "result-detail";
-      m.innerHTML = "<pre></pre>";
-      m.querySelector("pre").textContent = r.message || "";
-      box.appendChild(m);
-    }
-    list.appendChild(box);
-  });
-  container.appendChild(list);
-}
-
+// --- Sprawdzenie rozwiązania wzorcowego ---
 document.getElementById("check").addEventListener("click", function () {
-  var output = document.getElementById("check-output");
-  var tests = readTests();
-  if (tests.length === 0) {
-    output.innerHTML = '<div class="banner banner-bad">Dodaj co najmniej jeden test.</div>';
+  var data = readTests();
+  if (data.tests.length === 0) {
+    setStatus("Dodaj co najmniej jeden test.", "var(--forgot)", true);
     return;
   }
   var button = document.getElementById("check");
   button.disabled = true;
-  document.getElementById("check-label").textContent =
-    language === "csharp" ? "Uruchamiam… (C# kompiluje się kilka sekund)" : "Uruchamiam…";
+  setStatus(language === "csharp" ? "Uruchamiam… pierwsze uruchomienie C# trwa kilka sekund." : "Uruchamiam…", "var(--muted)", false);
   fetch("/api/run", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ language: language, kind: kind, code: solutionEditor.getValue(), tests: tests })
+    body: JSON.stringify({ language: language, kind: kind, code: solutionEditor.getValue(), tests: data.tests })
   })
     .then(function (res) {
-      return res.json().then(function (data) {
-        if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : "HTTP " + res.status);
-        return data;
+      return res.json().then(function (body) {
+        if (!res.ok) throw new Error(typeof body.detail === "string" ? body.detail : "HTTP " + res.status);
+        return body;
       });
     })
-    .then(function (data) { renderResults(output, data.results); })
-    .catch(function (err) {
-      output.innerHTML = '<div class="banner banner-bad"></div>';
-      output.firstChild.textContent = err.message;
+    .then(function (body) {
+      var passed = 0;
+      body.results.forEach(function (r, i) {
+        var row = data.rows[i];
+        var mark = row.querySelector(".mark");
+        var detail = row.querySelector(".row-detail");
+        if (r.status === "pass") {
+          passed++;
+          mark.textContent = "✓";
+          mark.style.cssText += "; background: var(--good-bg); color: var(--good)";
+          mark.setAttribute("aria-label", "Zaliczony");
+          detail.hidden = true;
+        } else {
+          mark.textContent = "✕";
+          mark.style.cssText += "; background: var(--forgot-bg); color: var(--forgot)";
+          mark.setAttribute("aria-label", "Niezaliczony");
+          detail.hidden = false;
+          detail.textContent = r.status === "fail"
+            ? "Oczekiwano " + r.expected + ", otrzymano " + (r.actual === "" ? "(nic)" : r.actual)
+            : r.status === "timeout" ? "Przekroczono limit czasu" : (r.message || "Błąd");
+        }
+      });
+      var total = body.results.length;
+      setStatus("Rozwiązanie wzorcowe przechodzi " + passed + " z " + total + " testów.",
+        passed === total ? "var(--good)" : "var(--forgot)", true);
     })
-    .finally(function () {
-      button.disabled = false;
-      document.getElementById("check-label").textContent = "Sprawdź rozwiązanie na testach";
-    });
+    .catch(function (err) { setStatus(err.message, "var(--forgot)", true); })
+    .finally(function () { button.disabled = false; });
 });
 
 // --- Zapis ---
 var FIELD_ERRORS = { title: "err-title", description: "err-description", solution: "err-solution", tests: "err-tests" };
 
 document.getElementById("save").addEventListener("click", function () {
+  if (!solutionEditor) return;   // edytory jeszcze się ładują
   Object.keys(FIELD_ERRORS).forEach(function (name) {
     document.getElementById(FIELD_ERRORS[name]).hidden = true;
     var el = document.getElementById(name);
@@ -290,8 +322,10 @@ document.getElementById("save").addEventListener("click", function () {
     starter_code: starterEditor.getValue(),
     hint: document.getElementById("hint").value,
     solution: solutionEditor.getValue(),
-    tests: readTests()
+    tests: readTests().tests
   };
+  var button = document.getElementById("save");
+  button.disabled = true;
   fetch(editId ? "/api/tasks/" + editId : "/api/tasks", {
     method: editId ? "PUT" : "POST",
     headers: { "Content-Type": "application/json" },
@@ -303,14 +337,14 @@ document.getElementById("save").addEventListener("click", function () {
         if (res.status === 422 && Array.isArray(data.detail)) {
           data.detail.forEach(function (problem) {
             var field = problem.loc[1];
-            var errId = FIELD_ERRORS[field];
-            if (!errId) return;
-            var span = document.getElementById(errId);
+            if (!FIELD_ERRORS[field]) return;
+            var span = document.getElementById(FIELD_ERRORS[field]);
             span.textContent = field === "tests" ? "Dodaj co najmniej jeden test." : "To pole jest wymagane.";
             span.hidden = false;
             var el = document.getElementById(field);
             if (el) el.classList.add("invalid");
           });
+          setStatus("Uzupełnij zaznaczone pola.", "var(--forgot)", true);
           return;
         }
         throw new Error(typeof data.detail === "string" ? data.detail : "HTTP " + res.status);
@@ -320,19 +354,37 @@ document.getElementById("save").addEventListener("click", function () {
       var box = document.getElementById("error");
       box.textContent = "Nie udało się zapisać: " + err.message;
       box.hidden = false;
-    });
+    })
+    .finally(function () { button.disabled = false; });
+});
+
+// Błąd przy polu znika, gdy zaczniesz je poprawiać
+["title", "description"].forEach(function (name) {
+  document.getElementById(name).addEventListener("input", function () {
+    document.getElementById(FIELD_ERRORS[name]).hidden = true;
+    document.getElementById(name).classList.remove("invalid");
+  });
+});
+document.getElementById("add-test").addEventListener("click", function () {
+  document.getElementById("err-tests").hidden = true;
 });
 
 // --- Start: edytory Monaco, potem (przy edycji) wczytanie zadania ---
-applyKindLabels();
+applyKind();
+applyLanguage();
 require.config({ paths: { vs: "/vendor/monaco/vs" } });
 require(["vs/editor/editor.main"], function () {
   var options = {
-    language: MONACO_LANG[language], theme: lrIsDark() ? "vs-dark" : "vs", automaticLayout: true,
-    minimap: { enabled: false }, fontSize: 13, scrollBeyondLastLine: false, tabSize: 4
+    language: language, theme: lrIsDark() ? "vs-dark" : "vs", automaticLayout: true, minimap: { enabled: false },
+    fontSize: 14, fontFamily: '"IBM Plex Mono", ui-monospace, Consolas, monospace', scrollBeyondLastLine: false,
+    tabSize: 4, padding: { top: 12 }, renderLineHighlight: "none"
   };
   starterEditor = monaco.editor.create(document.getElementById("starter-editor"), Object.assign({ value: "" }, options));
   solutionEditor = monaco.editor.create(document.getElementById("solution-editor"), Object.assign({ value: "" }, options));
+  solutionEditor.onDidChangeModelContent(function () {
+    clearCheck();
+    document.getElementById("err-solution").hidden = true;
+  });
   window.addEventListener("themechange", function (e) {
     monaco.editor.setTheme(e.detail === "ciemny" ? "vs-dark" : "vs");
   });
@@ -341,7 +393,10 @@ require(["vs/editor/editor.main"], function () {
   document.getElementById("heading").textContent = "Edytuj zadanie";
   document.title = "LeetRepeat — Edytuj zadanie";
   fetch("/api/tasks/" + editId)
-    .then(function (res) { if (!res.ok) throw new Error(res.status === 404 ? "Nie ma takiego zadania" : "HTTP " + res.status); return res.json(); })
+    .then(function (res) {
+      if (!res.ok) throw new Error(res.status === 404 ? "Nie ma takiego zadania" : "HTTP " + res.status);
+      return res.json();
+    })
     .then(function (task) {
       document.getElementById("title").value = task.title;
       document.getElementById("description").value = task.description;
@@ -350,14 +405,14 @@ require(["vs/editor/editor.main"], function () {
       kind = task.kind;
       setSeg("seg-language", language);
       setSeg("seg-kind", kind);
-      monaco.editor.setModelLanguage(starterEditor.getModel(), MONACO_LANG[language]);
-      monaco.editor.setModelLanguage(solutionEditor.getModel(), MONACO_LANG[language]);
+      applyLanguage();
       starterEditor.setValue(task.starter_code);
       solutionEditor.setValue(task.solution);
       document.getElementById("test-rows").innerHTML = "";
-      applyKindLabels();
+      applyKind();
       document.getElementById("test-rows").innerHTML = "";
       task.tests.forEach(function (t) { addTestRow(t.input, t.expected); });
+      clearCheck();
     })
     .catch(function (err) {
       var box = document.getElementById("error");
