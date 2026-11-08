@@ -1,5 +1,5 @@
 """Service: logika aplikacji — daty, harmonogram powtórek. Nie zna HTTP ani SQL."""
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from repository import tasks as repo
 from services.scheduler import next_review, preview
@@ -37,7 +37,24 @@ def summary(db_path):
     for language in ("python", "csharp"):
         due, total = repo.count_tasks(db_path, language, today().isoformat())
         result[language] = {"due": due, "total": total}
+    result["last_session"] = repo.last_session(db_path)
     return result
+
+
+def queue(db_path, language=None):
+    return repo.queue(db_path, today().isoformat(), language)
+
+
+def forecast(db_path, language=None):
+    """14 dni od dziś: [{date, count}], zaległe zadania liczą się do dziś."""
+    start = today()
+    end = start + timedelta(days=13)
+    counts = repo.due_counts_between(db_path, start.isoformat(), end.isoformat(), language)
+    days = []
+    for i in range(14):
+        day = (start + timedelta(days=i)).isoformat()
+        days.append({"date": day, "count": counts.get(day, 0)})
+    return days
 
 
 def review_task(db_path, task_id, review):

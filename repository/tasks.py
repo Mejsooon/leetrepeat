@@ -5,10 +5,10 @@ from core.database import connect
 def list_tasks(db_path, language=None):
     con = connect(db_path)
     if language:
-        rows = con.execute("SELECT id, title, language, kind, due_date FROM tasks"
+        rows = con.execute("SELECT id, title, language, kind, due_date, interval_days FROM tasks"
                            " WHERE language = ? ORDER BY due_date, id", (language,)).fetchall()
     else:
-        rows = con.execute("SELECT id, title, language, kind, due_date FROM tasks"
+        rows = con.execute("SELECT id, title, language, kind, due_date, interval_days FROM tasks"
                            " ORDER BY due_date, id").fetchall()
     con.close()
     return [dict(row) for row in rows]
@@ -24,8 +24,10 @@ def get_task(db_path, task_id):
     task = dict(row)
     task["tests"] = [dict(t) for t in con.execute(
         "SELECT input, expected FROM tests WHERE task_id = ? ORDER BY position", (task_id,))]
-    task["last_reviewed_at"] = con.execute(
-        "SELECT MAX(reviewed_at) FROM reviews WHERE task_id = ?", (task_id,)).fetchone()[0]
+    last = con.execute("SELECT reviewed_at, rating FROM reviews WHERE task_id = ?"
+                       " ORDER BY reviewed_at DESC, id DESC LIMIT 1", (task_id,)).fetchone()
+    task["last_reviewed_at"] = last["reviewed_at"] if last else None
+    task["last_rating"] = last["rating"] if last else None
     con.close()
     return task
 
@@ -129,3 +131,47 @@ def undo_last_review(db_path, task_id):
                     (last["prev_interval_days"], last["prev_due_date"], task_id))
     con.close()
     return {"interval_days": last["prev_interval_days"], "due_date": last["prev_due_date"]}
+
+
+# Najnowsza ocena zadania (data i ocena) — wspólny fragment SQL dla kolejki
+LAST_REVIEW = ("(SELECT {col} FROM reviews r WHERE r.task_id = t.id"
+               " ORDER BY r.reviewed_at DESC, r.id DESC LIMIT 1)")
+
+
+def queue(db_path, today, language=None):
+    """Zadania do powtórki dziś (kolejność jak due_task_ids) z datą i oceną ostatniej powtórki."""
+    con = connect(db_path)
+    sql = ("SELECT t.id, t.title, t.language, t.kind, t.description, "
+           + LAST_REVIEW.format(col="reviewed_at") + " AS last_reviewed_at, "
+           + LAST_REVIEW.format(col="rating") + " AS last_rating "
+           "FROM tasks t WHERE t.due_date <= ?")
+    params = [today]
+    if language:
+        sql += " AND t.language = ?"
+        params.append(language)
+    rows = con.execute(sql + " ORDER BY t.due_date, t.id", params).fetchall()
+    con.close()
+    return [dict(row) for row in rows]
+
+
+def due_counts_between(db_path, start, end, language=None):
+    """{data: liczba zadań} dla terminów do `end`; zaległe (przed `start`) liczą się do `start`."""
+    con = connect(db_path)
+    sql = ("SELECT CASE WHEN due_date < ? THEN ? ELSE due_date END AS day, COUNT(*) AS n "
+           "FROM tasks WHERE due_date <= ?")
+    params = [start, start, end]
+    if language:
+        sql += " AND language = ?"
+        params.append(language)
+    rows = con.execute(sql + " GROUP BY day", params).fetchall()
+    con.close()
+    return {row["day"]: row["n"] for row in rows}
+
+
+def last_session(db_path):
+    """Ostatni dzień z ocenami i liczba różnych zadań ocenionych tego dnia, albo None."""
+    con = connect(db_path)
+    row = con.execute("SELECT substr(reviewed_at, 1, 10) AS day, COUNT(DISTINCT task_id) AS n FROM reviews"
+                      " GROUP BY day ORDER BY day DESC LIMIT 1").fetchone()
+    con.close()
+    return {"date": row["day"], "count": row["n"]} if row else None

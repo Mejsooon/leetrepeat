@@ -43,6 +43,14 @@ def create_router(db_path):
     def due_tasks(language: str | None = None):
         return service.due_task_ids(db_path, language)
 
+    @router.get("/review/queue")
+    def review_queue(language: str | None = None):
+        return service.queue(db_path, language)
+
+    @router.get("/forecast")
+    def forecast(language: str | None = None):
+        return service.forecast(db_path, language)
+
     @router.get("/summary")
     def summary():
         return service.summary(db_path)

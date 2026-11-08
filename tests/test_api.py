@@ -57,7 +57,7 @@ def test_list_filter_language(client, task_body):
     client.post("/api/tasks", json={**task_body, "language": "csharp", "title": "C#"})
     tasks = client.get("/api/tasks?language=csharp").json()
     assert [t["title"] for t in tasks] == ["C#"]
-    assert set(tasks[0]) == {"id", "title", "language", "kind", "due_date"}
+    assert set(tasks[0]) == {"id", "title", "language", "kind", "due_date", "interval_days"}
     assert len(client.get("/api/tasks").json()) == 2
 
 
@@ -101,7 +101,7 @@ def test_due_and_summary_use_local_today(client, task_body, fixed_today):
     assert client.get("/api/review/due?language=python").json() == [task_id]
     assert client.get("/api/review/due?language=csharp").json() == []
     summary = client.get("/api/summary").json()
-    assert summary == {"python": {"due": 1, "total": 1}, "csharp": {"due": 0, "total": 0}}
+    assert summary["python"] == {"due": 1, "total": 1} and summary["csharp"] == {"due": 0, "total": 0}
     client.post(f"/api/tasks/{task_id}/review", json={"rating": "again"})
     assert client.get("/api/review/due").json() == []
     assert client.get("/api/summary").json()["python"] == {"due": 0, "total": 1}
@@ -180,3 +180,56 @@ def test_undo_legacy_review_409(client, task_body, db_path):
 
 def test_undo_missing_task_404(client):
     assert client.post("/api/tasks/999/review/undo").status_code == 404
+
+
+def test_list_includes_interval_days(client, task_body, fixed_today):
+    task_id = client.post("/api/tasks", json=task_body).json()["id"]
+    client.post(f"/api/tasks/{task_id}/review", json={"rating": "good"})
+    assert client.get("/api/tasks").json()[0]["interval_days"] == 3
+
+
+def test_get_task_last_rating(client, task_body, fixed_today):
+    task_id = client.post("/api/tasks", json=task_body).json()["id"]
+    assert client.get(f"/api/tasks/{task_id}").json()["last_rating"] is None
+    client.post(f"/api/tasks/{task_id}/review", json={"rating": "partial"})
+    assert client.get(f"/api/tasks/{task_id}").json()["last_rating"] == "partial"
+
+
+def test_queue_returns_due_with_last_rating(client, task_body, monkeypatch):
+    monkeypatch.setattr(task_service, "today", lambda: date(2026, 11, 7))
+    first = client.post("/api/tasks", json=task_body).json()["id"]
+    client.post(f"/api/tasks/{first}/review", json={"rating": "again"})     # termin: 2026-11-08
+    monkeypatch.setattr(task_service, "today", lambda: date(2026, 11, 8))
+    second = client.post("/api/tasks", json={**task_body, "title": "Drugie"}).json()["id"]
+    queue = client.get("/api/review/queue").json()
+    assert [t["id"] for t in queue] == [first, second]
+    assert queue[0]["last_rating"] == "again" and queue[1]["last_rating"] is None
+    assert set(queue[0]) == {"id", "title", "language", "kind", "description", "last_reviewed_at", "last_rating"}
+    assert client.get("/api/review/queue?language=csharp").json() == []
+
+
+def test_forecast_counts_overdue_today_and_filters_language(client, task_body, fixed_today, db_path):
+    ids = [client.post("/api/tasks", json={**task_body, "title": str(i), "language": lang}).json()["id"]
+           for i, lang in enumerate(["python", "python", "csharp", "python"])]
+    con = connect(db_path)
+    for task_id, due in zip(ids, ["2026-11-07", "2026-11-10", "2026-11-08", "2026-11-30"]):
+        con.execute("UPDATE tasks SET due_date = ? WHERE id = ?", (due, task_id))
+    con.commit()
+    forecast = client.get("/api/forecast").json()
+    assert len(forecast) == 14
+    assert forecast[0] == {"date": "2026-11-08", "count": 2}
+    assert forecast[2]["count"] == 1
+    assert forecast[13]["date"] == "2026-11-21"
+    assert sum(d["count"] for d in forecast) == 3
+    assert client.get("/api/forecast?language=python").json()[0]["count"] == 1
+
+
+def test_summary_last_session(client, task_body, fixed_today):
+    assert client.get("/api/summary").json()["last_session"] is None
+    a = client.post("/api/tasks", json=task_body).json()["id"]
+    b = client.post("/api/tasks", json={**task_body, "title": "B"}).json()["id"]
+    client.post(f"/api/tasks/{a}/review", json={"rating": "again"})
+    client.post(f"/api/tasks/{a}/review", json={"rating": "good"})
+    client.post(f"/api/tasks/{b}/review", json={"rating": "good"})
+    last = client.get("/api/summary").json()["last_session"]
+    assert last["count"] == 2 and len(last["date"]) == 10
