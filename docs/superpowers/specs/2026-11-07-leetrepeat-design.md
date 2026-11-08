@@ -202,12 +202,12 @@ UI pokazuje pod każdym przyciskiem przewidywany odstęp — `GET /api/tasks/{id
 | Metoda | Ścieżka | Opis |
 |---|---|---|
 | GET | `/api/tasks?language=` | lista zadań (bez testów), sortowana po `due_date` |
-| GET | `/api/tasks/{id}` | zadanie z testami i `preview` odstępów dla trzech ocen |
+| GET | `/api/tasks/{id}` | zadanie z testami, `preview` odstępów dla trzech ocen i `last_reviewed_at` (z `reviews`, NULL gdy brak) |
 | POST | `/api/tasks` | utworzenie zadania z testami |
 | PUT | `/api/tasks/{id}` | edycja zadania; testy zastępowane w całości; harmonogram bez zmian |
 | DELETE | `/api/tasks/{id}` | usunięcie (kaskadowo testy i historia) |
 | GET | `/api/review/due?language=` | id zadań z `due_date <= dziś`, najstarsze pierwsze |
-| GET | `/api/summary` | `{python: n, csharp: n}` — liczba zadań do powtórki dziś |
+| GET | `/api/summary` | `{python: {due, total}, csharp: {due, total}}` — liczba zadań do powtórki dziś i łączna liczba zadań wg języka |
 | POST | `/api/run` | `{language, kind, code, tests}` → lista wyników |
 | POST | `/api/tasks/{id}/review` | `{rating, tests_passed, tests_total, hint_used, solution_used}` → `{interval_days, due_date}` |
 
@@ -215,13 +215,15 @@ Walidacja przez modele Pydantic; błędy → HTTP 422 z nazwą pola. Nieistniej�
 
 ## 7. Ekrany
 
-1. **Start (`/`)** — liczba zadań do powtórki dziś wg języka; przycisk „Zacznij powtórkę”
+1. **Start (`/`)** — liczba zadań do powtórki dziś wg języka oraz łączna liczba zadań w każdym języku; przycisk „Zacznij powtórkę”
    (wszystkie lub wybrany język); linki „Dodaj zadanie” i „Wszystkie zadania”.
 2. **Zadanie (`/task.html?id=…` lub sesja `?session=python|csharp|all`)** — po lewej treść
    (Markdown), przyciski „Podpowiedź” i „Rozwiązanie” (rozwijane); po prawej edytor Monaco
    z kodem startowym, „Uruchom testy”, lista wyników; na dole trzy przyciski oceny z przewidywanym
    odstępem. W sesji po ocenie przejście do kolejnego zadania; na końcu „Koniec na dziś”.
-   Pasek u góry: tytuł, język, typ, licznik `n / m` w sesji.
+   Pasek u góry: licznik `n / m` z paskiem postępu i przycisk „Zakończ sesję” (powrót na Start).
+   Przy tytule: plakietki języka i typu oraz „ostatnio: X dni temu” (ukryte dla nigdy nieocenionych).
+   Pod edytorem przycisk „Przywróć kod startowy” (podmienia treść edytora na `starter_code`).
 3. **Lista (`/list.html`)** — tabela: tytuł, język, typ, następna powtórka; filtr języka;
    „Otwórz”, „Edytuj”, „Usuń” (z potwierdzeniem).
 4. **Formularz (`/form.html`, `?id=` dla edycji)** — tytuł, język, typ, treść, kod startowy (Monaco),
