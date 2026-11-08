@@ -23,7 +23,7 @@ def test_vendor_and_shared_files_served(client):
 def test_pages_served(client):
     home = client.get("/").text
     assert "Zacznij powtórkę" in home and "theme-toggle" in home
-    assert "Wszystkie zadania" in client.get("/list.html").text
+    assert "Biblioteka" in client.get("/list.html").text
 
 
 def test_form_served(client):
@@ -48,3 +48,8 @@ def test_today_page_served(client):
     page = client.get("/").text
     for needle in ["Zacznij powtórkę", "Najbliższe dwa tygodnie", "theme-toggle"]:
         assert needle in page, needle
+
+
+def test_library_page_served(client):
+    page = client.get("/list.html").text
+    assert "Biblioteka" in page and "Szukaj po tytule" in page

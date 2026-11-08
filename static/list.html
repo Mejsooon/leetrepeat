@@ -1,58 +1,72 @@
 <!doctype html>
-<html lang="pl" class="lr-dark">
+<html lang="pl" class="lr-light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LeetRepeat — Wszystkie zadania</title>
+<title>LeetRepeat — Biblioteka</title>
 <script src="/theme.js"></script>
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" href="data:,">
 </head>
 <body>
-<header class="lr-header">
-  <a class="lr-logo" href="/"><span class="lr-logo-mark">&lt;/&gt;</span><span class="lr-logo-name">LeetRepeat</span></a>
-  <nav class="lr-nav">
-    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Przełącz tryb jasny / ciemny"></button>
-    <a href="/">Start</a>
-    <a href="/list.html" class="active">Wszystkie zadania</a>
-    <a href="/form.html" class="lr-nav-add">+ Dodaj zadanie</a>
-  </nav>
+<header class="bar">
+  <div class="container bar-inner">
+    <a class="logo" href="/">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="7" y="3" width="17" height="20" rx="4" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"></rect><rect x="3" y="6" width="17" height="20" rx="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.5"></rect><path d="M9 13l-2.5 2.5L9 18M14 13l2.5 2.5L14 18" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span>LeetRepeat</span>
+    </a>
+    <nav class="nav" aria-label="Główna">
+      <a class="nav-link" href="/">Dziś</a>
+      <a class="nav-link" href="/list.html" aria-current="page">Biblioteka</a>
+      <a class="btn primary" href="/form.html" style="min-height: 40px; margin-left: 8px">Nowe zadanie</a>
+      <button type="button" id="theme-toggle" class="btn quiet icon" aria-label="Przełącz tryb jasny lub ciemny"></button>
+    </nav>
+  </div>
 </header>
 
-<main class="page page-wide">
-  <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
-    <div style="display: flex; flex-direction: column; gap: 6px">
-      <h1 style="font-size: 32px">Wszystkie zadania</h1>
-      <p id="count" class="muted"></p>
+<main class="container" style="padding-top: 48px; padding-bottom: 80px; display: flex; flex-direction: column; gap: 32px">
+  <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <h1 style="font-size: 44px; line-height: 1.05; letter-spacing: -0.03em; font-weight: 700">Biblioteka</h1>
+      <p id="count" style="font-size: 16px; color: var(--ink-2)"></p>
     </div>
-    <div class="seg" role="group" aria-label="Filtr języka">
-      <button type="button" data-lang="" class="on">Wszystkie</button>
-      <button type="button" data-lang="python">Python</button>
-      <button type="button" data-lang="csharp">C#</button>
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center">
+      <label style="position: relative; display: block; width: 280px; max-width: 100%">
+        <span class="sr-only">Szukaj zadania</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="position: absolute; left: 14px; top: 14px"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+        <input id="search" type="search" class="input" placeholder="Szukaj po tytule" style="padding-left: 40px" autocomplete="off">
+      </label>
+      <div role="group" aria-label="Filtr języka" class="seg" id="filters">
+        <button type="button" data-lang="" class="on">Wszystkie</button>
+        <button type="button" data-lang="python">Python</button>
+        <button type="button" data-lang="csharp">C#</button>
+      </div>
     </div>
   </div>
 
-  <div id="table" class="table-box">
-    <table>
-      <thead>
-        <tr><th>Tytuł</th><th>Język</th><th>Typ</th><th>Następna powtórka</th><th style="text-align: right">Akcje</th></tr>
-      </thead>
-      <tbody id="rows"></tbody>
-    </table>
+  <div id="groups" style="display: flex; flex-direction: column; gap: 32px"></div>
+
+  <div id="no-results" style="padding: 48px 32px; border-radius: 18px; border: 1px dashed var(--line-strong); display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center" hidden>
+    <p id="no-results-title" style="font-size: 17px; font-weight: 600"></p>
+    <p class="help" style="font-size: 15px">Zmień wyszukiwanie albo dodaj nowe zadanie.</p>
+    <a href="/form.html" class="btn primary">Nowe zadanie</a>
   </div>
 
-  <div id="empty" class="card" style="align-items: center; text-align: center" hidden>
-    <h2 style="font-size: 20px">Brak zadań — dodaj pierwsze</h2>
-    <a class="btn btn-primary" href="/form.html">+ Dodaj zadanie</a>
+  <div id="empty" class="card" style="padding: 48px 32px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center" hidden>
+    <p style="font-size: 20px; font-weight: 700">Nie masz jeszcze zadań</p>
+    <p class="help" style="font-size: 15px">Dodaj pierwsze zadanie albo zaimportuj gotowy zestaw z folderu seeds.</p>
+    <a href="/form.html" class="btn primary">Nowe zadanie</a>
   </div>
 
-  <p class="muted" style="font-size: 13px">Usunięcie pyta o potwierdzenie i kasuje też testy oraz historię ocen zadania.</p>
-  <p id="error" class="banner banner-bad" hidden></p>
+  <p id="error" class="banner error" hidden></p>
 </main>
 
 <script>
-var currentLanguage = "";
-var LANG_NAME = { python: "Python", csharp: "C#" };
+var allTasks = [];
+var language = "";
+var LANG = { python: "Python", csharp: "C#" };
+var STRENGTH = ["Nowe", "Słabo", "Uczysz się", "Nieźle", "Dobrze", "Utrwalone"];
+var TRASH = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg>';
 
 function zadan(n) {
   if (n === 1) return "zadanie";
@@ -66,66 +80,112 @@ function showError(text) {
   box.hidden = false;
 }
 
-function loadTasks() {
-  var url = "/api/tasks" + (currentLanguage ? "?language=" + currentLanguage : "");
-  fetch(url)
-    .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-    .then(function (tasks) {
-      document.getElementById("count").textContent =
-        tasks.length + " " + zadan(tasks.length) + " · posortowane wg następnej powtórki";
-      document.getElementById("table").hidden = tasks.length === 0;
-      document.getElementById("empty").hidden = tasks.length !== 0;
+// Rysuje listę z danych w pamięci (filtr języka + wyszukiwarka działają bez pytania serwera)
+function render() {
+  var query = document.getElementById("search").value.trim().toLowerCase();
+  var visible = allTasks.filter(function (t) {
+    return (!language || t.language === language) && (!query || t.title.toLowerCase().indexOf(query) !== -1);
+  });
 
-      // "Dziś" liczone lokalnie (jak na serwerze), jako północ dzisiejszego dnia
-      var now = new Date();
-      var todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  document.getElementById("empty").hidden = allTasks.length !== 0;
+  document.getElementById("no-results").hidden = allTasks.length === 0 || visible.length !== 0;
+  document.getElementById("no-results-title").textContent = query
+    ? "Nie ma zadań pasujących do „" + document.getElementById("search").value.trim() + "”"
+    : "Nie ma zadań w tym języku";
+  document.getElementById("count").textContent = visible.length + " " + zadan(visible.length) + ", posortowane według terminu powtórki";
 
-      var tbody = document.getElementById("rows");
-      tbody.innerHTML = "";
-      tasks.forEach(function (task) {
-        var parts = task.due_date.split("-");
-        var due = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-        var days = Math.round((due - todayMidnight) / 86400000);
-        var dueText = days <= 0 ? "dziś" : days === 1 ? "jutro" : "za " + days + " dni";
+  var now = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  var groups = [
+    { title: "Do powtórki dziś", items: [] },
+    { title: "W tym tygodniu", items: [] },
+    { title: "Później", items: [] }
+  ];
+  visible.forEach(function (task) {
+    var p = task.due_date.split("-");
+    var days = Math.round((new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])) - today) / 86400000);
+    task._days = days;
+    if (days <= 0) groups[0].items.push(task);
+    else if (days <= 7) groups[1].items.push(task);
+    else groups[2].items.push(task);
+  });
 
-        var tr = document.createElement("tr");
-        tr.innerHTML =
-          '<td style="font-weight: 500"></td>' +
-          '<td><span class="chip chip-' + task.language + '">' + LANG_NAME[task.language] + "</span></td>" +
-          '<td class="mono" style="font-size: 13px; color: var(--text-3)">' + task.kind + "</td>" +
-          '<td><span class="' + (days <= 0 ? "due-today" : "due-later") + '">' + dueText + "</span></td>" +
-          '<td><div style="display: flex; gap: 6px; justify-content: flex-end">' +
-          '<a class="btn btn-small" href="/task.html?id=' + task.id + '">Otwórz</a>' +
-          '<a class="btn btn-small btn-ghost" href="/form.html?id=' + task.id + '">Edytuj</a>' +
-          '<button type="button" class="btn btn-small btn-icon" aria-label="Usuń zadanie">' +
-          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>' +
-          "</button></div></td>";
-        tr.querySelector("td").textContent = task.title;   // tytuł jako tekst, nie HTML
-        tr.querySelector("button").addEventListener("click", function () {
-          if (!confirm("Usunąć zadanie „" + task.title + "”? Testy i historia ocen też zostaną usunięte.")) return;
-          fetch("/api/tasks/" + task.id, { method: "DELETE" })
-            .then(function (res) {
-              if (!res.ok && res.status !== 404) throw new Error("HTTP " + res.status);
-              loadTasks();
-            })
-            .catch(function (err) { showError("Nie udało się usunąć zadania (" + err.message + ")."); });
-        });
-        tbody.appendChild(tr);
+  var box = document.getElementById("groups");
+  box.innerHTML = "";
+  groups.forEach(function (group) {
+    if (group.items.length === 0) return;
+    var section = document.createElement("section");
+    section.style.cssText = "display: flex; flex-direction: column; gap: 12px";
+    section.innerHTML =
+      '<div style="display: flex; align-items: baseline; gap: 10px; padding: 0 4px">' +
+      '<h2 style="font-size: 18px; font-weight: 700; letter-spacing: -0.01em"></h2>' +
+      '<span style="font-size: 14px; color: var(--muted)"></span></div><ul class="task-list"></ul>';
+    section.querySelector("h2").textContent = group.title;
+    section.querySelector("span").textContent = group.items.length;
+    var list = section.querySelector("ul");
+
+    group.items.forEach(function (task) {
+      // Stopień utrwalenia z obecnego odstępu powtórek (spec v2, F4)
+      var iv = task.interval_days;
+      var level = iv === 0 ? 0 : iv < 3 ? 1 : iv < 7 ? 2 : iv < 15 ? 3 : iv < 30 ? 4 : 5;
+      var dueText = task._days <= 0 ? "Dziś" : task._days === 1 ? "Jutro" : "Za " + task._days + " dni";
+
+      var li = document.createElement("li");
+      li.innerHTML =
+        '<a class="main" href="/task.html?id=' + task.id + '"><span class="title"></span>' +
+        '<span style="display: flex; gap: 6px"><span class="chip ' + task.language + '">' + LANG[task.language] + '</span>' +
+        '<span class="chip">' + task.kind + '</span></span></a>' +
+        '<div class="strength" role="img"><div class="dots"></div><span class="label"></span></div>' +
+        '<span class="due' + (task._days <= 0 ? ' today' : '') + '"></span>' +
+        '<div style="flex: 0 0 auto; display: flex; gap: 4px">' +
+        '<a class="btn quiet small" href="/form.html?id=' + task.id + '" style="min-height: 40px">Edytuj</a>' +
+        '<button type="button" class="btn quiet icon danger" style="min-height: 40px; width: 40px">' + TRASH + '</button></div>';
+      li.querySelector(".title").textContent = task.title;
+      var dots = li.querySelector(".dots");
+      for (var k = 1; k <= 5; k++) {
+        var dot = document.createElement("span");
+        if (k <= level) dot.className = "on";
+        dots.appendChild(dot);
+      }
+      li.querySelector(".strength").setAttribute("aria-label", "Utrwalenie: " + STRENGTH[level].toLowerCase() + ", " + level + " z 5");
+      li.querySelector(".strength .label").textContent = STRENGTH[level];
+      li.querySelector(".due").textContent = dueText;
+      var del = li.querySelector("button");
+      del.setAttribute("aria-label", "Usuń zadanie " + task.title);
+      del.addEventListener("click", function () {
+        if (!confirm("Usunąć zadanie „" + task.title + "”? Testy i historia ocen też zostaną usunięte.")) return;
+        del.disabled = true;
+        fetch("/api/tasks/" + task.id, { method: "DELETE" })
+          .then(function (res) {
+            if (!res.ok && res.status !== 404) throw new Error("HTTP " + res.status);
+            load();
+          })
+          .catch(function (err) { del.disabled = false; showError("Nie udało się usunąć zadania (" + err.message + ")."); });
       });
-    })
+      list.appendChild(li);
+    });
+    box.appendChild(section);
+  });
+}
+
+function load() {
+  fetch("/api/tasks")
+    .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    .then(function (tasks) { allTasks = tasks; render(); })
     .catch(function (err) { showError("Nie udało się pobrać zadań (" + err.message + "). Czy serwer działa?"); });
 }
 
-document.querySelectorAll(".seg button").forEach(function (button) {
+document.getElementById("search").addEventListener("input", render);
+document.querySelectorAll("#filters button").forEach(function (button) {
   button.addEventListener("click", function () {
-    document.querySelectorAll(".seg button").forEach(function (b) { b.classList.remove("on"); });
+    document.querySelectorAll("#filters button").forEach(function (b) { b.classList.remove("on"); });
     button.classList.add("on");
-    currentLanguage = button.dataset.lang;
-    loadTasks();
+    language = button.dataset.lang;
+    render();
   });
 });
 
-loadTasks();
+load();
 </script>
 </body>
 </html>
