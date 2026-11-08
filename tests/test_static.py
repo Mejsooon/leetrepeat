@@ -34,3 +34,11 @@ def test_form_served(client):
 def test_task_page_served(client):
     page = client.get("/task.html").text
     assert "Uruchom testy" in page and "Nie pamiętam" in page and "Przywróć kod startowy" in page
+
+
+def test_v2_assets_served(client):
+    for name in ["latin-400", "latin-500", "latin-ext-400", "latin-ext-500"]:
+        assert client.get(f"/vendor/fonts/ibm-plex-mono-{name}.woff2").status_code == 200
+    css = client.get("/style.css").text
+    for needle in ["--forgot", "backdrop-filter", "prefers-reduced-transparency", "IBM Plex Mono", ".sr-only"]:
+        assert needle in css, needle
