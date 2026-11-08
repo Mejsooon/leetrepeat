@@ -64,7 +64,8 @@ dwóch adresów.
 ## Dane i kopia zapasowa
 
 Wszystkie zadania, testy i historia ocen są w jednym pliku **`leetrepeat.db`** obok `main.py`.
-Kopia zapasowa = skopiuj ten plik. Inna lokalizacja bazy: zmienna `LEETREPEAT_DB`, np.
+Kopia zapasowa = skopiuj ten plik. Po aktualizacji aplikacji baza sama dostaje nowe kolumny przy pierwszym
+uruchomieniu — nic nie trzeba robić ręcznie (ocen sprzed aktualizacji nie da się cofnąć). Inna lokalizacja bazy: zmienna `LEETREPEAT_DB`, np.
 `LEETREPEAT_DB=~/zadania.db python main.py`.
 
 ## Jak pisać zadania
@@ -106,6 +107,32 @@ python seeds/import_tasks.py seeds/python_variables.json
 | `python_variables.json` | 10 zadań z notatki PYTHON — VARIABLES: typy, `isinstance`, konwersje, swap, mutowalność, kopie, `is` vs `==`, nazwy zmiennych |
 
 Zadania, które już są w bazie (ten sam tytuł i język), są pomijane — import można powtarzać.
+
+## Skróty klawiszowe (sesja powtórki)
+
+| Skrót | Działanie |
+|---|---|
+| `Ctrl + Enter` (Mac: `⌘ + Enter`) | uruchom testy — działa też z kursorem w edytorze |
+| `1` / `2` / `3` | ocena: Nie pamiętam / Częściowo / Dobrze pamiętam (gdy nie piszesz w edytorze ani w polu tekstowym) |
+
+Po ocenie możesz kliknąć **Cofnij ocenę** — zadanie wraca do stanu sprzed oceny (działa dla najnowszej oceny zadania).
+
+## Ekrany
+
+- **Dziś** — ile zadań czeka, kolejka (pierwsze 3 zadania), wykres powtórek na 14 dni, informacja o ostatniej sesji.
+- **Sesja** — pasek u góry ma po jednym segmencie na zadanie, w kolorze Twojej oceny.
+- **Biblioteka** — zadania pogrupowane według terminu, wyszukiwarka, pasek utrwalenia:
+
+| Odstęp powtórek | Utrwalenie |
+|---|---|
+| nowe zadanie | Nowe |
+| < 3 dni | Słabo |
+| < 7 dni | Uczysz się |
+| < 15 dni | Nieźle |
+| < 30 dni | Dobrze |
+| 30+ dni | Utrwalone |
+
+- **Nowe zadanie** — przełącznik „Pisz / Podgląd” pokazuje treść tak, jak zobaczysz ją w sesji.
 
 ## Powtórki
 
