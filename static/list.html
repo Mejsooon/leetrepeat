@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pl" class="lr-dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LeetRepeat — Wszystkie zadania</title>
+<script src="/theme.js"></script>
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="data:,">
+</head>
+<body>
+<header class="lr-header">
+  <a class="lr-logo" href="/"><span class="lr-logo-mark">&lt;/&gt;</span><span class="lr-logo-name">LeetRepeat</span></a>
+  <nav class="lr-nav">
+    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Przełącz tryb jasny / ciemny"></button>
+    <a href="/">Start</a>
+    <a href="/list.html" class="active">Wszystkie zadania</a>
+    <a href="/form.html" class="lr-nav-add">+ Dodaj zadanie</a>
+  </nav>
+</header>
+
+<main class="page page-wide">
+  <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h1 style="font-size: 32px">Wszystkie zadania</h1>
+      <p id="count" class="muted"></p>
+    </div>
+    <div class="seg" role="group" aria-label="Filtr języka">
+      <button type="button" data-lang="" class="on">Wszystkie</button>
+      <button type="button" data-lang="python">Python</button>
+      <button type="button" data-lang="csharp">C#</button>
+    </div>
+  </div>
+
+  <div id="table" class="table-box">
+    <table>
+      <thead>
+        <tr><th>Tytuł</th><th>Język</th><th>Typ</th><th>Następna powtórka</th><th style="text-align: right">Akcje</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+
+  <div id="empty" class="card" style="align-items: center; text-align: center" hidden>
+    <h2 style="font-size: 20px">Brak zadań — dodaj pierwsze</h2>
+    <a class="btn btn-primary" href="/form.html">+ Dodaj zadanie</a>
+  </div>
+
+  <p class="muted" style="font-size: 13px">Usunięcie pyta o potwierdzenie i kasuje też testy oraz historię ocen zadania.</p>
+  <p id="error" class="banner banner-bad" hidden></p>
+</main>
+
+<script>
+var currentLanguage = "";
+var LANG_NAME = { python: "Python", csharp: "C#" };
+
+function zadan(n) {
+  if (n === 1) return "zadanie";
+  if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) return "zadania";
+  return "zadań";
+}
+
+function showError(text) {
+  var box = document.getElementById("error");
+  box.textContent = text;
+  box.hidden = false;
+}
+
+function loadTasks() {
+  var url = "/api/tasks" + (currentLanguage ? "?language=" + currentLanguage : "");
+  fetch(url)
+    .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    .then(function (tasks) {
+      document.getElementById("count").textContent =
+        tasks.length + " " + zadan(tasks.length) + " · posortowane wg następnej powtórki";
+      document.getElementById("table").hidden = tasks.length === 0;
+      document.getElementById("empty").hidden = tasks.length !== 0;
+
+      // "Dziś" liczone lokalnie (jak na serwerze), jako północ dzisiejszego dnia
+      var now = new Date();
+      var todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      var tbody = document.getElementById("rows");
+      tbody.innerHTML = "";
+      tasks.forEach(function (task) {
+        var parts = task.due_date.split("-");
+        var due = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        var days = Math.round((due - todayMidnight) / 86400000);
+        var dueText = days <= 0 ? "dziś" : days === 1 ? "jutro" : "za " + days + " dni";
+
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          '<td style="font-weight: 500"></td>' +
+          '<td><span class="chip chip-' + task.language + '">' + LANG_NAME[task.language] + "</span></td>" +
+          '<td class="mono" style="font-size: 13px; color: var(--text-3)">' + task.kind + "</td>" +
+          '<td><span class="' + (days <= 0 ? "due-today" : "due-later") + '">' + dueText + "</span></td>" +
+          '<td><div style="display: flex; gap: 6px; justify-content: flex-end">' +
+          '<a class="btn btn-small" href="/task.html?id=' + task.id + '">Otwórz</a>' +
+          '<a class="btn btn-small btn-ghost" href="/form.html?id=' + task.id + '">Edytuj</a>' +
+          '<button type="button" class="btn btn-small btn-icon" aria-label="Usuń zadanie">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>' +
+          "</button></div></td>";
+        tr.querySelector("td").textContent = task.title;   // tytuł jako tekst, nie HTML
+        tr.querySelector("button").addEventListener("click", function () {
+          if (!confirm("Usunąć zadanie „" + task.title + "”? Testy i historia ocen też zostaną usunięte.")) return;
+          fetch("/api/tasks/" + task.id, { method: "DELETE" })
+            .then(function (res) {
+              if (!res.ok && res.status !== 404) throw new Error("HTTP " + res.status);
+              loadTasks();
+            })
+            .catch(function (err) { showError("Nie udało się usunąć zadania (" + err.message + ")."); });
+        });
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(function (err) { showError("Nie udało się pobrać zadań (" + err.message + "). Czy serwer działa?"); });
+}
+
+document.querySelectorAll(".seg button").forEach(function (button) {
+  button.addEventListener("click", function () {
+    document.querySelectorAll(".seg button").forEach(function (b) { b.classList.remove("on"); });
+    button.classList.add("on");
+    currentLanguage = button.dataset.lang;
+    loadTasks();
+  });
+});
+
+loadTasks();
+</script>
+</body>
+</html>

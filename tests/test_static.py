@@ -18,3 +18,9 @@ def test_vendor_and_shared_files_served(client):
     css = client.get("/style.css").text
     assert ".lr-light" in css and "--accent" in css
     assert "leetrepeat-theme" in client.get("/theme.js").text
+
+
+def test_pages_served(client):
+    home = client.get("/").text
+    assert "Do powtórki dziś" in home and "theme-toggle" in home
+    assert "Wszystkie zadania" in client.get("/list.html").text
