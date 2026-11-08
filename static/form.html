@@ -374,8 +374,13 @@ applyKind();
 applyLanguage();
 require.config({ paths: { vs: "/vendor/monaco/vs" } });
 require(["vs/editor/editor.main"], function () {
+  // Motywy edytora w kolorach aplikacji (tło jak --code-bg)
+  monaco.editor.defineTheme("lr-light", { base: "vs", inherit: true, rules: [],
+    colors: { "editor.background": "#FAFBFD", "editorLineNumber.foreground": "#9AA3B5", "editorGutter.background": "#FAFBFD" } });
+  monaco.editor.defineTheme("lr-dark", { base: "vs-dark", inherit: true, rules: [],
+    colors: { "editor.background": "#10182A", "editorLineNumber.foreground": "#4F5D7A", "editorGutter.background": "#10182A" } });
   var options = {
-    language: language, theme: lrIsDark() ? "vs-dark" : "vs", automaticLayout: true, minimap: { enabled: false },
+    language: language, theme: lrIsDark() ? "lr-dark" : "lr-light", automaticLayout: true, minimap: { enabled: false },
     fontSize: 14, fontFamily: '"IBM Plex Mono", ui-monospace, Consolas, monospace', scrollBeyondLastLine: false,
     tabSize: 4, padding: { top: 12 }, renderLineHighlight: "none"
   };
@@ -386,7 +391,7 @@ require(["vs/editor/editor.main"], function () {
     document.getElementById("err-solution").hidden = true;
   });
   window.addEventListener("themechange", function (e) {
-    monaco.editor.setTheme(e.detail === "ciemny" ? "vs-dark" : "vs");
+    monaco.editor.setTheme(e.detail === "ciemny" ? "lr-dark" : "lr-light");
   });
 
   if (!editId) return;

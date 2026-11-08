@@ -1,116 +1,124 @@
 <!doctype html>
-<html lang="pl" class="lr-dark">
+<html lang="pl" class="lr-light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LeetRepeat — Zadanie</title>
+<title>LeetRepeat — Sesja powtórki</title>
 <script src="/theme.js"></script>
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" href="data:,">
 </head>
 <body>
-<header class="lr-header">
-  <a class="lr-logo" href="/"><span class="lr-logo-mark">&lt;/&gt;</span><span class="lr-logo-name">LeetRepeat</span></a>
-  <div class="lr-nav" style="gap: 16px">
-    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Przełącz tryb jasny / ciemny"></button>
-    <div id="session-bar" style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap" hidden>
-      <span id="session-label" style="color: var(--muted); font-size: 14px"></span>
-      <div style="display: flex; align-items: center; gap: 10px">
-        <div class="progress"><div id="progress-fill" style="width: 0"></div></div>
-        <span id="progress-text" class="mono" style="font-size: 14px; font-weight: 600"></span>
+<header class="bar">
+  <div class="container wide bar-inner" style="gap: 20px">
+    <a class="logo" href="/">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="7" y="3" width="17" height="20" rx="4" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"></rect><rect x="3" y="6" width="17" height="20" rx="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.5"></rect><path d="M9 13l-2.5 2.5L9 18M14 13l2.5 2.5L14 18" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span>LeetRepeat</span>
+    </a>
+    <div id="session-bar" style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 6px" hidden>
+      <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted)">
+        <span id="session-label"></span>
+        <span id="progress-text" style="font-weight: 600; color: var(--ink-2)"></span>
       </div>
-      <a href="/" class="btn btn-small btn-ghost" style="min-height: 40px">Zakończ sesję</a>
+      <div class="segments" id="segments" role="img"></div>
     </div>
-    <div id="plain-nav" class="lr-nav" hidden>
-      <a href="/">Start</a>
-      <a href="/list.html">Wszystkie zadania</a>
-    </div>
+    <nav class="nav" aria-label="Główna">
+      <span id="plain-nav" style="display: flex; gap: 4px" hidden>
+        <a class="nav-link" href="/">Dziś</a>
+        <a class="nav-link" href="/list.html">Biblioteka</a>
+      </span>
+      <button type="button" id="theme-toggle" class="btn quiet icon" aria-label="Przełącz tryb jasny lub ciemny"></button>
+      <a id="end-session" href="/" class="btn quiet" style="min-height: 40px" hidden>Zakończ sesję</a>
+    </nav>
   </div>
 </header>
 
-<main id="finished" class="page page-narrow" style="padding-top: 72px" hidden>
-  <div class="card" style="align-items: center; text-align: center">
-    <h1 style="font-size: 32px">Koniec na dziś 🎉</h1>
-    <p id="finished-text" class="muted"></p>
-    <a class="btn btn-primary" href="/">Wróć na Start</a>
+<main id="finished" class="container" style="padding-top: 72px; padding-bottom: 80px" hidden>
+  <div class="card" style="max-width: 640px; margin: 0 auto; padding: 40px; display: flex; flex-direction: column; gap: 18px; align-items: flex-start">
+    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--good)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12.5 11 15.5 16.5 9.5"></polyline></svg>
+    <h1 style="font-size: 36px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 700">Koniec na dziś</h1>
+    <p id="finished-text" style="font-size: 17px; color: var(--ink-2)"></p>
+    <div id="finished-pills" style="display: flex; gap: 8px; flex-wrap: wrap"></div>
+    <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px">
+      <a class="btn primary" href="/">Wróć do ekranu Dziś</a>
+      <a class="btn" href="/list.html">Biblioteka</a>
+    </div>
   </div>
 </main>
 
-<main id="task-area" class="task-layout" hidden>
-  <aside class="task-left">
-    <div style="display: flex; flex-direction: column; gap: 12px">
-      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+<main id="task-area" class="container wide" style="padding-top: 32px; padding-bottom: 40px; display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start" hidden>
+  <article style="flex: 1 1 360px; min-width: 0; max-width: 460px; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
         <span id="chip-lang" class="chip"></span>
         <span id="chip-kind" class="chip"></span>
-        <span id="chip-last" class="chip chip-plain" hidden></span>
+        <span id="last-info" style="font-size: 13px; color: var(--muted); margin-left: 4px"></span>
       </div>
-      <h1 id="title" style="font-size: 28px"></h1>
+      <h1 id="title" class="wrap-anywhere" style="font-size: 36px; line-height: 1.08; letter-spacing: -0.03em; font-weight: 700"></h1>
     </div>
 
     <div id="description" class="prose"></div>
 
-    <div style="display: flex; flex-direction: column; gap: 10px">
-      <button type="button" id="hint-toggle" class="toggle">
-        <span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"></path></svg>
-          Podpowiedź
-        </span>
-        <span class="state" id="hint-state">pokaż</span>
+    <div class="disclosure">
+      <button type="button" id="hint-toggle" aria-expanded="false" aria-controls="hint-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"></polyline></svg>
+        Podpowiedź
+        <span class="note">nie wpływa na ocenę</span>
       </button>
-      <div id="hint-box" class="hint-box" hidden></div>
-
-      <button type="button" id="solution-toggle" class="toggle">
-        <span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--blue-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z"></path><path d="M22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"></path></svg>
-          Pełne rozwiązanie
-        </span>
-        <span class="state" id="solution-state">pokaż</span>
+      <p id="hint-box" class="panel" hidden></p>
+      <div class="divider"></div>
+      <button type="button" id="solution-toggle" aria-expanded="false" aria-controls="solution-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"></polyline></svg>
+        Pełne rozwiązanie
       </button>
-      <pre id="solution-box" class="code-box" hidden></pre>
+      <pre id="solution-box" class="panel" hidden></pre>
     </div>
-  </aside>
+  </article>
 
-  <section class="task-right">
+  <section aria-label="Twoje rozwiązanie" style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
     <div class="editor-box">
-      <div class="editor-head"><span id="file-name" class="mono"></span><span>edytor</span></div>
+      <div class="editor-head">
+        <span id="file-name" class="file code"></span>
+        <button type="button" id="reset" class="btn quiet small" style="margin-left: auto; font-weight: 500">Przywróć kod startowy</button>
+        <button type="button" id="run" class="btn primary small" style="padding: 0 14px">
+          <span id="run-label">Uruchom testy</span>
+          <span id="run-shortcut" style="font-size: 12px; font-weight: 500; opacity: 0.8"></span>
+        </button>
+      </div>
       <div id="editor" class="editor"></div>
     </div>
 
-    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
-      <button type="button" id="run" class="btn btn-run">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
-        <span id="run-label">Uruchom testy</span>
-      </button>
-      <button type="button" id="reset" class="btn btn-ghost">Przywróć kod startowy</button>
-      <span id="run-info" class="muted" style="font-size: 13px"></span>
+    <div class="card" aria-live="polite" style="border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+        <h2 style="font-size: 17px; font-weight: 700">Testy</h2>
+        <span id="results-summary" style="font-size: 14px; color: var(--ink-2)"></span>
+      </div>
+      <p id="results-empty" class="help" style="font-size: 15px">Uruchom testy, żeby sprawdzić swój kod. Ocenę wybierasz sam, niezależnie od wyniku.</p>
+      <ul id="results" class="results"></ul>
     </div>
 
-    <div class="card" style="padding: 16px 18px; gap: 10px; border-radius: 12px">
-      <div style="display: flex; justify-content: space-between; align-items: center">
-        <h2>Wyniki testów</h2>
-        <span id="results-count" class="mono" style="font-size: 13px; font-weight: 600"></span>
-      </div>
-      <p id="results-empty" class="muted">Kliknij „Uruchom testy”, żeby sprawdzić swój kod.</p>
-      <div id="results" class="results"></div>
-    </div>
-
-    <div class="card" style="padding: 18px; gap: 14px; border-radius: 12px; margin-top: 8px">
-      <h2>Jak poszło?</h2>
-      <div id="rates" class="rates">
-        <button type="button" class="rate rate-again" data-rating="again">Nie pamiętam<small id="preview-again"></small></button>
-        <button type="button" class="rate rate-partial" data-rating="partial">Częściowo<small id="preview-partial"></small></button>
-        <button type="button" class="rate rate-good" data-rating="good">Dobrze pamiętam<small id="preview-good"></small></button>
-      </div>
-      <div id="rated" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 10px; background: var(--raised)" hidden>
-        <span id="rated-text" style="font-size: 14px; color: var(--text-2)"></span>
-        <button type="button" id="next" class="btn btn-primary" style="font-size: 14px">Następne zadanie →</button>
-        <a id="back" class="btn btn-primary" style="font-size: 14px" href="/list.html" hidden>Wróć do listy</a>
-      </div>
-    </div>
-
-    <p id="error" class="banner banner-bad" hidden></p>
+    <p id="error" class="banner error" hidden></p>
   </section>
 </main>
+
+<div id="dock" class="bar bottom" hidden>
+  <div class="container wide bar-inner" style="padding-top: 14px; padding-bottom: 14px; gap: 16px 24px">
+    <div id="rates-box" style="display: contents">
+      <p style="flex: 1 1 200px; font-size: 16px; font-weight: 600">Jak dobrze pamiętałeś to zadanie?</p>
+      <div role="group" aria-label="Ocena" class="rates" style="flex: 3 1 560px">
+        <button type="button" class="rate again" data-rating="again"><span class="label"><span class="kbd">1</span>Nie pamiętam</span><span class="when" id="when-again"></span></button>
+        <button type="button" class="rate partial" data-rating="partial"><span class="label"><span class="kbd">2</span>Częściowo</span><span class="when" id="when-partial"></span></button>
+        <button type="button" class="rate good" data-rating="good"><span class="label"><span class="kbd">3</span>Dobrze pamiętam</span><span class="when" id="when-good"></span></button>
+      </div>
+    </div>
+    <div id="rated-box" style="display: contents" hidden>
+      <p id="rated-text" style="flex: 1 1 300px; font-size: 16px"></p>
+      <button type="button" id="undo" class="btn quiet">Cofnij ocenę</button>
+      <button type="button" id="next" class="btn primary" style="min-height: 48px; padding: 0 24px">Następne zadanie</button>
+      <a id="back" class="btn primary" href="/list.html" style="min-height: 48px; padding: 0 24px" hidden>Wróć do biblioteki</a>
+    </div>
+  </div>
+</div>
 
 <script src="/vendor/marked.umd.js"></script>
 <script src="/vendor/monaco/vs/loader.js"></script>
@@ -118,19 +126,32 @@
 var params = new URLSearchParams(location.search);
 var session = params.get("session");            // python | csharp | all | null
 var singleId = params.get("id");
-var queue = [];                                  // id zadań w tej sesji
+var queue = [];                                  // id zadań w sesji
+var ratings = [];                                // ocena każdego zadania z kolejki (albo null)
 var position = 0;                                // które zadanie z kolejki jest teraz
-var task = null;                                 // bieżące zadanie z API
+var task = null;
 var editor = null;
 var hintUsed = false;
 var solutionUsed = false;
 var lastRun = null;                              // {passed, total} z ostatniego uruchomienia testów
-var reviewedCount = 0;                           // ile zadań oceniono w tej sesji
-var LANG_NAME = { python: "Python", csharp: "C#" };
-var RATING_NAME = { again: "Nie pamiętam", partial: "Częściowo", good: "Dobrze pamiętam" };
+var runToken = 0;                                // wynik starego uruchomienia nie trafi do nowego zadania
+var LANG = { python: "Python", csharp: "C#" };
+var RATING = { again: "Nie pamiętam", partial: "Częściowo", good: "Dobrze pamiętam" };
+var isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+var CHECK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+var CROSS = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>';
+var CLOCK = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>';
+
+document.getElementById("run-shortcut").textContent = isMac ? "⌘ Enter" : "Ctrl + Enter";
 
 function inDays(n) {
   return n <= 0 ? "dziś" : n === 1 ? "jutro" : "za " + n + " dni";
+}
+
+function daysAgo(text) {
+  var p = text.slice(0, 10).split("-");
+  var now = new Date();
+  return Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]))) / 86400000);
 }
 
 function showError(text) {
@@ -139,16 +160,32 @@ function showError(text) {
   box.hidden = false;
 }
 
-// Pobiera kolejne zadanie z kolejki; usunięte w międzyczasie (404) pomija
+// Pasek sesji: jeden segment na zadanie, kolor = ocena, obramowanie = bieżące
+function renderSegments() {
+  if (!session) return;
+  var box = document.getElementById("segments");
+  box.innerHTML = "";
+  var rated = 0;
+  queue.forEach(function (id, i) {
+    var seg = document.createElement("span");
+    if (ratings[i]) { seg.className = ratings[i]; rated++; }
+    else if (i === position) seg.className = "current";
+    box.appendChild(seg);
+  });
+  box.setAttribute("aria-label", "Postęp sesji: ocenione " + rated + " z " + queue.length);
+  document.getElementById("progress-text").textContent = Math.min(position + 1, queue.length) + " z " + queue.length;
+}
+
+function showDock(rated) {
+  document.getElementById("dock").hidden = false;
+  document.getElementById("rates-box").hidden = rated;
+  document.getElementById("rated-box").hidden = !rated;
+}
+
+// Pobiera bieżące zadanie z kolejki; usunięte w międzyczasie (404) pomija
 function loadCurrent() {
   if (position >= queue.length) {
-    document.getElementById("task-area").hidden = true;
-    document.getElementById("finished").hidden = false;
-    document.getElementById("session-bar").hidden = true;
-    document.getElementById("plain-nav").hidden = false;
-    document.getElementById("finished-text").textContent = queue.length === 0
-      ? "Nie masz nic do powtórki w tej sesji."
-      : "Powtórzone zadania: " + reviewedCount + ". Następne powtórki zobaczysz na ekranie Start.";
+    showFinished();
     return;
   }
   fetch("/api/tasks/" + queue[position])
@@ -161,46 +198,62 @@ function loadCurrent() {
     .catch(function (err) { showError("Nie udało się pobrać zadania (" + err.message + ")."); });
 }
 
+function showFinished() {
+  document.getElementById("task-area").hidden = true;
+  document.getElementById("dock").hidden = true;
+  document.getElementById("session-bar").hidden = true;
+  document.getElementById("end-session").hidden = true;
+  document.getElementById("plain-nav").hidden = false;
+  document.getElementById("finished").hidden = false;
+  var counts = { again: 0, partial: 0, good: 0 };
+  var rated = 0;
+  ratings.forEach(function (r) { if (r) { counts[r]++; rated++; } });
+  document.getElementById("finished-text").textContent = queue.length === 0
+    ? "Nie masz nic do powtórki w tej sesji."
+    : "Oceniłeś " + rated + " z " + queue.length + ". Następne powtórki zobaczysz na ekranie Dziś.";
+  var pills = document.getElementById("finished-pills");
+  pills.innerHTML = "";
+  ["again", "partial", "good"].forEach(function (r) {
+    if (!counts[r]) return;
+    var pill = document.createElement("span");
+    pill.className = "pill " + r;
+    pill.textContent = RATING[r] + ": " + counts[r];
+    pills.appendChild(pill);
+  });
+}
+
 function showTask(data) {
   task = data;
   hintUsed = false;
   solutionUsed = false;
   lastRun = null;
+  runToken++;
   document.getElementById("finished").hidden = true;
   document.getElementById("task-area").hidden = false;
   document.getElementById("error").hidden = true;
   document.title = "LeetRepeat — " + task.title;
+  renderSegments();
 
-  if (session) {
-    document.getElementById("progress-text").textContent = (position + 1) + " / " + queue.length;
-    document.getElementById("progress-fill").style.width = Math.round((position + 1) / queue.length * 100) + "%";
-  }
-
-  var chipLang = document.getElementById("chip-lang");
-  chipLang.className = "chip chip-" + task.language;
-  chipLang.textContent = LANG_NAME[task.language];
+  var chip = document.getElementById("chip-lang");
+  chip.className = "chip " + task.language;
+  chip.textContent = LANG[task.language];
   document.getElementById("chip-kind").textContent = task.kind;
-
-  var chipLast = document.getElementById("chip-last");
-  chipLast.hidden = !task.last_reviewed_at;
+  var info = "Nowe zadanie";
   if (task.last_reviewed_at) {
-    var now = new Date();
-    var todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    var d = new Date(task.last_reviewed_at);
-    var reviewedMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    var ago = Math.round((todayMidnight - reviewedMidnight) / 86400000);
-    chipLast.textContent = "ostatnio: " + (ago <= 0 ? "dziś" : ago === 1 ? "wczoraj" : ago + " dni temu");
+    var ago = daysAgo(task.last_reviewed_at);
+    info = "Ostatnio " + (ago <= 0 ? "dziś" : ago === 1 ? "wczoraj" : ago + " dni temu");
+    if (task.last_rating) info += ", ocena: " + RATING[task.last_rating].toLowerCase();
   }
-
+  document.getElementById("last-info").textContent = info;
   document.getElementById("title").textContent = task.title;
   document.getElementById("description").innerHTML = marked.parse(task.description);
 
-  document.getElementById("hint-box").textContent = task.hint || "Brak podpowiedzi dla tego zadania.";
-  document.getElementById("hint-box").hidden = true;
-  document.getElementById("hint-state").textContent = "pokaż";
+  document.getElementById("hint-box").textContent = task.hint || "To zadanie nie ma podpowiedzi.";
   document.getElementById("solution-box").textContent = task.solution;
-  document.getElementById("solution-box").hidden = true;
-  document.getElementById("solution-state").textContent = "pokaż";
+  ["hint", "solution"].forEach(function (name) {
+    document.getElementById(name + "-box").hidden = true;
+    document.getElementById(name + "-toggle").setAttribute("aria-expanded", "false");
+  });
 
   document.getElementById("file-name").textContent = task.language === "python" ? "rozwiazanie.py" : "Rozwiazanie.cs";
   monaco.editor.setModelLanguage(editor.getModel(), task.language);
@@ -208,42 +261,37 @@ function showTask(data) {
 
   document.getElementById("results").innerHTML = "";
   document.getElementById("results-empty").hidden = false;
-  document.getElementById("results-count").textContent = "";
-  document.getElementById("run-info").textContent = "";
+  document.getElementById("results-summary").textContent = "";
+  document.getElementById("run").disabled = false;
+  document.getElementById("run-label").textContent = "Uruchom testy";
 
   ["again", "partial", "good"].forEach(function (r) {
-    document.getElementById("preview-" + r).textContent = inDays(task.preview[r]);
+    document.getElementById("when-" + r).textContent = inDays(task.preview[r]);
   });
-  document.getElementById("rates").hidden = false;
-  document.getElementById("rated").hidden = true;
+  showDock(false);
   window.scrollTo(0, 0);
 }
 
-// --- Podpowiedź i rozwiązanie (rozwijane) ---
-document.getElementById("hint-toggle").addEventListener("click", function () {
-  var box = document.getElementById("hint-box");
-  box.hidden = !box.hidden;
-  if (!box.hidden) hintUsed = true;
-  document.getElementById("hint-state").textContent = box.hidden ? "pokaż" : "ukryj";
-});
-document.getElementById("solution-toggle").addEventListener("click", function () {
-  var box = document.getElementById("solution-box");
-  box.hidden = !box.hidden;
-  if (!box.hidden) solutionUsed = true;
-  document.getElementById("solution-state").textContent = box.hidden ? "pokaż" : "ukryj";
+// --- Podpowiedź i rozwiązanie ---
+["hint", "solution"].forEach(function (name) {
+  document.getElementById(name + "-toggle").addEventListener("click", function () {
+    var box = document.getElementById(name + "-box");
+    box.hidden = !box.hidden;
+    this.setAttribute("aria-expanded", box.hidden ? "false" : "true");
+    if (!box.hidden && name === "hint") hintUsed = true;
+    if (!box.hidden && name === "solution") solutionUsed = true;
+  });
 });
 
-document.getElementById("reset").addEventListener("click", function () {
-  editor.setValue(task.starter_code);
-});
+document.getElementById("reset").addEventListener("click", function () { editor.setValue(task.starter_code); });
 
 // --- Uruchamianie testów ---
-document.getElementById("run").addEventListener("click", function () {
+function runTests() {
   var button = document.getElementById("run");
+  if (!task || button.disabled) return;
   button.disabled = true;
-  document.getElementById("run-label").textContent = "Uruchamiam…";
-  document.getElementById("run-info").textContent =
-    task.language === "csharp" ? "pierwsze uruchomienie C# trwa kilka sekund" : "";
+  document.getElementById("run-label").textContent = task.language === "csharp" ? "Kompiluję i uruchamiam…" : "Uruchamiam…";
+  var token = runToken;
   var started = performance.now();
   fetch("/api/run", {
     method: "POST",
@@ -257,115 +305,182 @@ document.getElementById("run").addEventListener("click", function () {
       });
     })
     .then(function (data) {
-      var seconds = ((performance.now() - started) / 1000).toFixed(1).replace(".", ",");
-      document.getElementById("run-info").textContent = LANG_NAME[task.language] + " · " + seconds + " s";
+      if (token !== runToken) return;   // użytkownik przeszedł już do innego zadania
       var results = data.results;
       var passed = results.filter(function (r) { return r.status === "pass"; }).length;
       lastRun = { passed: passed, total: results.length };
-      var count = document.getElementById("results-count");
-      count.textContent = passed + " / " + results.length + " zaliczone";
-      count.style.color = passed === results.length ? "var(--green)" : "var(--red)";
+      var seconds = ((performance.now() - started) / 1000).toFixed(1).replace(".", ",");
+      var summary = document.getElementById("results-summary");
+      summary.innerHTML = '<strong></strong> zaliczone, <span></span>';
+      summary.querySelector("strong").textContent = passed + " z " + results.length;
+      summary.querySelector("strong").style.color = passed === results.length ? "var(--good)" : "var(--forgot)";
+      summary.querySelector("span").textContent = LANG[task.language] + ", " + seconds + " s";
       document.getElementById("results-empty").hidden = true;
 
       var list = document.getElementById("results");
       list.innerHTML = "";
       results.forEach(function (r) {
-        var box = document.createElement("div");
-        box.className = "result result-" + r.status;
-        var label = { pass: "✓ OK", fail: "✗ BŁĄD", error: "💥 WYJĄTEK", timeout: "⏱ CZAS" }[r.status];
-        box.innerHTML = '<div class="result-row"><span class="result-label"></span><span class="in"></span><span class="out" style="color: var(--subtle)"></span></div>';
-        box.querySelector(".result-label").textContent = label;
-        box.querySelector(".in").textContent = r.input === "" ? "(puste wejście)" : r.input;
+        var li = document.createElement("li");
+        var icon = r.status === "pass" ? CHECK : r.status === "timeout" ? CLOCK : CROSS;
+        var label = { pass: "zaliczony", fail: "niezaliczony", error: "błąd", timeout: "przekroczony czas" }[r.status];
+        li.innerHTML = '<span class="mark ' + r.status + '">' + icon + '<span class="sr-only"></span></span>' +
+          '<div style="display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-top: 2px"><code class="call"></code></div>';
+        li.querySelector(".sr-only").textContent = label;
+        li.querySelector(".call").textContent = r.input === "" ? "(puste wejście)" : r.input;
+        var body = li.querySelector("div");
         if (r.status === "pass") {
-          box.querySelector(".out").textContent = "→ " + r.actual;
+          var out = document.createElement("code");
+          out.className = "out";
+          out.textContent = r.actual;
+          li.appendChild(out);
         } else if (r.status === "fail") {
-          var d = document.createElement("div");
-          d.className = "result-detail";
-          d.innerHTML = 'oczekiwano <span class="ok-text"></span> · otrzymano <span class="bad-text"></span>';
+          var d = document.createElement("span");
+          d.className = "detail";
+          d.innerHTML = 'Oczekiwano <code class="ok-text"></code>, otrzymano <code class="bad-text"></code>';
           d.querySelector(".ok-text").textContent = r.expected;
           d.querySelector(".bad-text").textContent = r.actual === "" ? "(nic)" : r.actual;
-          box.appendChild(d);
+          body.appendChild(d);
         } else {
-          var m = document.createElement("div");
-          m.className = "result-detail";
+          var m = document.createElement("span");
+          m.className = "detail";
           m.innerHTML = "<pre></pre>";
-          m.querySelector("pre").textContent = r.message || "";
-          box.appendChild(m);
+          m.querySelector("pre").textContent = r.status === "timeout" ? (r.message || "Przekroczono limit czasu") : (r.message || "Błąd");
+          body.appendChild(m);
         }
-        list.appendChild(box);
+        list.appendChild(li);
       });
     })
-    .catch(function (err) { showError(err.message); document.getElementById("run-info").textContent = ""; })
+    .catch(function (err) { if (token === runToken) showError(err.message); })
     .finally(function () {
+      if (token !== runToken) return;
       button.disabled = false;
       document.getElementById("run-label").textContent = "Uruchom testy";
     });
-});
+}
+document.getElementById("run").addEventListener("click", runTests);
 
 // --- Ocena ---
-document.querySelectorAll("#rates button").forEach(function (button) {
-  button.addEventListener("click", function () {
-    var rating = button.dataset.rating;
-    fetch("/api/tasks/" + task.id + "/review", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        rating: rating,
-        tests_passed: lastRun ? lastRun.passed : null,
-        tests_total: lastRun ? lastRun.total : null,
-        hint_used: hintUsed,
-        solution_used: solutionUsed
-      })
+function rate(rating) {
+  if (!task || document.getElementById("rates-box").hidden) return;
+  var buttons = document.querySelectorAll("#rates-box .rate");
+  buttons.forEach(function (b) { b.disabled = true; });
+  fetch("/api/tasks/" + task.id + "/review", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      rating: rating,
+      tests_passed: lastRun ? lastRun.passed : null,
+      tests_total: lastRun ? lastRun.total : null,
+      hint_used: hintUsed,
+      solution_used: solutionUsed
     })
-      .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-      .then(function (data) {
-        var parts = data.due_date.split("-");
-        var due = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-        var now = new Date();
-        var days = Math.round((due - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 86400000);
-        document.getElementById("rated-text").innerHTML = "Zapisano: <strong></strong> · następna powtórka <span></span>";
-        document.querySelector("#rated-text strong").textContent = RATING_NAME[rating];
-        document.querySelector("#rated-text span").textContent = inDays(days);
-        reviewedCount++;
-        document.getElementById("rates").hidden = true;
-        document.getElementById("rated").hidden = false;
-        var last = position + 1 >= queue.length;
-        document.getElementById("next").hidden = !session;
-        document.getElementById("next").textContent = last ? "Zakończ sesję →" : "Następne zadanie →";
-        document.getElementById("back").hidden = !!session;
-      })
-      .catch(function (err) { showError("Nie udało się zapisać oceny (" + err.message + ")."); });
-  });
+  })
+    .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+    .then(function (data) {
+      ratings[position] = rating;
+      renderSegments();
+      var text = document.getElementById("rated-text");
+      text.innerHTML = "Zapisano: <strong></strong>. Wrócisz do tego zadania <span></span>.";
+      text.querySelector("strong").textContent = RATING[rating].toLowerCase();
+      text.querySelector("span").textContent = inDays(daysAgo(data.due_date) * -1);
+      var last = position + 1 >= queue.length;
+      document.getElementById("next").hidden = !session;
+      document.getElementById("next").textContent = last ? "Zakończ sesję" : "Następne zadanie";
+      document.getElementById("back").hidden = !!session;
+      document.getElementById("undo").disabled = false;
+      showDock(true);
+    })
+    .catch(function (err) { showError("Nie udało się zapisać oceny (" + err.message + ")."); })
+    .finally(function () { buttons.forEach(function (b) { b.disabled = false; }); });
+}
+document.querySelectorAll("#rates-box .rate").forEach(function (b) {
+  b.addEventListener("click", function () { rate(b.dataset.rating); });
+});
+
+// --- Cofnięcie oceny (F2): przycisk blokowany od razu, więc dwa kliknięcia cofają tylko raz ---
+document.getElementById("undo").addEventListener("click", function () {
+  var button = document.getElementById("undo");
+  if (button.disabled) return;
+  button.disabled = true;
+  fetch("/api/tasks/" + task.id + "/review/undo", { method: "POST" })
+    .then(function (res) {
+      return res.json().then(function (data) {
+        if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : "HTTP " + res.status);
+        return data;
+      });
+    })
+    .then(function () {
+      ratings[position] = null;
+      renderSegments();
+      showDock(false);
+    })
+    .catch(function (err) { button.disabled = false; showError(err.message); });
 });
 
 document.getElementById("next").addEventListener("click", function () {
   position++;
+  if (position >= queue.length) { showFinished(); return; }
   loadCurrent();
+});
+
+// --- Skróty klawiszowe (F1) ---
+document.addEventListener("keydown", function (e) {
+  var inEditor = e.target.closest && e.target.closest(".monaco-editor");
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+    if (inEditor) return;            // w edytorze obsługuje to editor.addCommand
+    e.preventDefault();
+    runTests();
+    return;
+  }
+  if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+  if (inEditor) return;
+  var tag = e.target.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || e.target.isContentEditable) return;
+  var map = { "1": "again", "2": "partial", "3": "good" };
+  if (map[e.key] && !document.getElementById("dock").hidden && !document.getElementById("rates-box").hidden) {
+    e.preventDefault();
+    rate(map[e.key]);
+  }
 });
 
 // --- Start: edytor Monaco, potem kolejka sesji albo jedno zadanie ---
 require.config({ paths: { vs: "/vendor/monaco/vs" } });
 require(["vs/editor/editor.main"], function () {
+  // Motywy edytora w kolorach aplikacji (tło jak --code-bg)
+  monaco.editor.defineTheme("lr-light", { base: "vs", inherit: true, rules: [],
+    colors: { "editor.background": "#FAFBFD", "editorLineNumber.foreground": "#9AA3B5", "editorGutter.background": "#FAFBFD" } });
+  monaco.editor.defineTheme("lr-dark", { base: "vs-dark", inherit: true, rules: [],
+    colors: { "editor.background": "#10182A", "editorLineNumber.foreground": "#4F5D7A", "editorGutter.background": "#10182A" } });
   editor = monaco.editor.create(document.getElementById("editor"), {
-    value: "", language: "python", theme: lrIsDark() ? "vs-dark" : "vs", automaticLayout: true,
-    minimap: { enabled: false }, fontSize: 14, scrollBeyondLastLine: false, tabSize: 4
+    value: "", language: "python", theme: lrIsDark() ? "lr-dark" : "lr-light", automaticLayout: true,
+    minimap: { enabled: false }, fontSize: 14.5, lineHeight: 25,
+    fontFamily: '"IBM Plex Mono", ui-monospace, Consolas, monospace', scrollBeyondLastLine: false,
+    tabSize: 4, padding: { top: 16 }, renderLineHighlight: "none"
   });
+  editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, runTests);
   window.addEventListener("themechange", function (e) {
-    monaco.editor.setTheme(e.detail === "ciemny" ? "vs-dark" : "vs");
+    monaco.editor.setTheme(e.detail === "ciemny" ? "lr-dark" : "lr-light");
   });
 
   if (session) {
     document.getElementById("session-bar").hidden = false;
+    document.getElementById("end-session").hidden = false;
     document.getElementById("session-label").textContent =
-      "Sesja: " + (session === "all" ? "wszystkie języki" : LANG_NAME[session] || session);
+      "Sesja: " + (session === "all" ? "wszystkie języki" : LANG[session] || session);
     var url = "/api/review/due" + (session === "python" || session === "csharp" ? "?language=" + session : "");
     fetch(url)
       .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-      .then(function (ids) { queue = ids; position = 0; loadCurrent(); })
+      .then(function (ids) {
+        queue = ids;
+        ratings = ids.map(function () { return null; });
+        position = 0;
+        loadCurrent();
+      })
       .catch(function (err) { showError("Nie udało się pobrać listy powtórek (" + err.message + ")."); });
   } else if (singleId) {
     document.getElementById("plain-nav").hidden = false;
     queue = [Number(singleId)];
+    ratings = [null];
     position = 0;
     loadCurrent();
   } else {

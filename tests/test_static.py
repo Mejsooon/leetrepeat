@@ -59,3 +59,9 @@ def test_editor_page_served(client):
     page = client.get("/form.html").text
     for needle in ["Nowe zadanie", "Podgląd", "Sprawdź rozwiązanie"]:
         assert needle in page, needle
+
+
+def test_session_page_served(client):
+    page = client.get("/task.html").text
+    for needle in ["Jak dobrze pamiętałeś to zadanie?", "Cofnij ocenę", "Uruchom testy"]:
+        assert needle in page, needle
