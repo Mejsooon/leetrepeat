@@ -1,103 +1,233 @@
 <!doctype html>
-<html lang="pl" class="lr-dark">
+<html lang="pl" class="lr-light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LeetRepeat — Start</title>
+<title>LeetRepeat — Dziś</title>
 <script src="/theme.js"></script>
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" href="data:,">
 </head>
 <body>
-<header class="lr-header">
-  <a class="lr-logo" href="/"><span class="lr-logo-mark">&lt;/&gt;</span><span class="lr-logo-name">LeetRepeat</span></a>
-  <nav class="lr-nav">
-    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Przełącz tryb jasny / ciemny"></button>
-    <a href="/" class="active">Start</a>
-    <a href="/list.html">Wszystkie zadania</a>
-    <a href="/form.html" class="lr-nav-add">+ Dodaj zadanie</a>
-  </nav>
+<header class="bar">
+  <div class="container bar-inner">
+    <a class="logo" href="/">
+      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect x="7" y="3" width="17" height="20" rx="4" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"></rect><rect x="3" y="6" width="17" height="20" rx="4" fill="var(--surface)" stroke="var(--accent)" stroke-width="1.5"></rect><path d="M9 13l-2.5 2.5L9 18M14 13l2.5 2.5L14 18" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span>LeetRepeat</span>
+    </a>
+    <nav class="nav" aria-label="Główna">
+      <a class="nav-link" href="/" aria-current="page">Dziś</a>
+      <a class="nav-link" href="/list.html">Biblioteka</a>
+      <a class="btn primary" href="/form.html" style="min-height: 40px; margin-left: 8px">Nowe zadanie</a>
+      <button type="button" id="theme-toggle" class="btn quiet icon" aria-label="Przełącz tryb jasny lub ciemny"></button>
+    </nav>
+  </div>
 </header>
 
-<main class="page page-narrow" style="padding-top: 56px; gap: 32px">
-  <div style="display: flex; flex-direction: column; gap: 8px">
-    <p id="today" class="muted" style="font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase"></p>
-    <h1 id="headline" style="font-size: 40px; letter-spacing: -0.02em">Do powtórki dziś: …</h1>
-  </div>
-
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px">
-    <section class="card">
-      <div style="display: flex; align-items: center; justify-content: space-between">
-        <span class="chip chip-python" style="font-size: 13px">Python</span>
-        <span id="python-total" class="muted" style="font-size: 13px"></span>
+<main class="container" style="padding-top: 64px; padding-bottom: 80px; display: flex; flex-direction: column; gap: 72px">
+  <section style="display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+    <div style="flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 28px">
+      <p id="today" style="color: var(--muted); font-size: 15px"></p>
+      <h1 id="headline" style="font-size: clamp(40px, 6vw, 60px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; max-width: 12ch">Wczytuję…</h1>
+      <p id="last-session" style="font-size: 18px; line-height: 1.55; color: var(--ink-2); max-width: 44ch"></p>
+      <div role="group" aria-label="Języki w sesji" class="seg" id="filters" style="align-self: flex-start">
+        <button type="button" data-lang="" class="on">Wszystkie <span class="count" id="count-all"></span></button>
+        <button type="button" data-lang="python">Python <span class="count" id="count-python"></span></button>
+        <button type="button" data-lang="csharp">C# <span class="count" id="count-csharp"></span></button>
       </div>
-      <div style="display: flex; align-items: baseline; gap: 10px">
-        <span id="python-due" style="font-size: 56px; font-weight: 700; line-height: 1">–</span>
-        <span style="color: var(--muted)">do powtórki</span>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap">
+        <a id="start" href="/task.html?session=all" class="btn primary big">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"></path></svg>
+          Zacznij powtórkę
+        </a>
+        <a href="/list.html" class="btn big">Przejrzyj bibliotekę</a>
       </div>
-      <a id="python-go" class="btn" href="/task.html?session=python">Powtórz Python</a>
-    </section>
+    </div>
 
-    <section class="card">
-      <div style="display: flex; align-items: center; justify-content: space-between">
-        <span class="chip chip-csharp" style="font-size: 13px">C#</span>
-        <span id="csharp-total" class="muted" style="font-size: 13px"></span>
+    <div aria-label="Kolejka na dziś" style="flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column">
+      <div id="deck" class="deck" hidden>
+        <div class="behind b3" id="deck-3"></div>
+        <div class="behind b2" id="deck-2"></div>
+        <article class="top">
+          <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+            <span class="chip" id="deck-lang"></span>
+            <span class="chip" id="deck-kind"></span>
+            <span style="margin-left: auto; font-size: 13px; color: var(--muted)">Pierwsze w kolejce</span>
+          </div>
+          <h2 id="deck-title"></h2>
+          <p class="desc" id="deck-desc"></p>
+          <div class="foot">
+            <span id="deck-last"></span>
+            <span class="pill" id="deck-rating" hidden></span>
+          </div>
+        </article>
       </div>
-      <div style="display: flex; align-items: baseline; gap: 10px">
-        <span id="csharp-due" style="font-size: 56px; font-weight: 700; line-height: 1">–</span>
-        <span style="color: var(--muted)">do powtórki</span>
+      <p id="queue-note" style="margin-top: 18px; font-size: 14px; color: var(--muted); text-align: center" hidden></p>
+
+      <div id="all-done" class="card" style="padding: 40px 32px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start" hidden>
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--good)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12.5 11 15.5 16.5 9.5"></polyline></svg>
+        <h2 style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em">Na dziś wszystko powtórzone</h2>
+        <p id="next-review" style="font-size: 15px; color: var(--ink-2)"></p>
+        <a href="/form.html" class="btn" style="margin-top: 8px">Dodaj nowe zadanie</a>
       </div>
-      <a id="csharp-go" class="btn" href="/task.html?session=csharp">Powtórz C#</a>
-    </section>
-  </div>
+    </div>
+  </section>
 
-  <a id="all-go" class="btn btn-primary btn-big" href="/task.html?session=all">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
-    <span id="all-label">Zacznij powtórkę — wszystkie języki</span>
-  </a>
+  <section aria-labelledby="forecast-title" class="card" style="padding: 32px; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px">
+      <h2 id="forecast-title" style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em">Najbliższe dwa tygodnie</h2>
+      <p class="help" style="font-size: 14px">Ile zadań wróci do powtórki każdego dnia</p>
+    </div>
+    <div style="overflow-x: auto">
+      <div class="forecast" id="forecast"></div>
+    </div>
+  </section>
 
-  <div id="done" class="card" style="align-items: center; text-align: center" hidden>
-    <h2 style="font-size: 22px">Koniec na dziś 🎉</h2>
-    <p class="muted">Nie masz już nic do powtórki. <a href="/list.html">Zobacz wszystkie zadania</a> albo <a href="/form.html">dodaj nowe</a>.</p>
-  </div>
-
-  <p id="error" class="banner banner-bad" hidden></p>
+  <p id="error" class="banner error" hidden></p>
 </main>
 
 <script>
-// Odmiana: 1 zadanie, 2–4 zadania, 5+ zadań (12–14 też "zadań")
-function zadan(n) {
-  if (n === 1) return "zadanie";
-  if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) return "zadania";
-  return "zadań";
+var language = "";   // "" = wszystkie, "python", "csharp"
+var summary = null;
+var RATING = { again: "Nie pamiętam", partial: "Częściowo", good: "Dobrze" };
+var LANG = { python: "Python", csharp: "C#" };
+var WEEKDAY = ["nd", "pn", "wt", "śr", "cz", "pt", "sb"];
+
+// Data "YYYY-MM-DD" → lokalna północ
+function parseDay(text) {
+  var p = text.slice(0, 10).split("-");
+  return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+}
+
+function daysAgo(text) {
+  var now = new Date();
+  var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((today - parseDay(text)) / 86400000);
+}
+
+function showError(text) {
+  var box = document.getElementById("error");
+  box.textContent = text;
+  box.hidden = false;
+}
+
+function load() {
+  var query = language ? "?language=" + language : "";
+  Promise.all([
+    fetch("/api/summary").then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }),
+    fetch("/api/review/queue" + query).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }),
+    fetch("/api/forecast" + query).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+  ])
+    .then(function (data) {
+      summary = data[0];
+      var queue = data[1];
+      var forecast = data[2];
+
+      // --- Nagłówek i liczniki w filtrze ---
+      var n = queue.length;
+      var word = n === 1 ? "zadanie czeka" : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? "zadania czekają" : "zadań czeka");
+      var where = language === "python" ? " w Pythonie" : language === "csharp" ? " w C#" : "";
+      document.getElementById("headline").textContent = n === 0
+        ? "Nic" + where + " nie czeka dziś na powtórkę"
+        : n + " " + word + where + " na powtórkę";
+      document.getElementById("count-all").textContent = summary.python.due + summary.csharp.due;
+      document.getElementById("count-python").textContent = summary.python.due;
+      document.getElementById("count-csharp").textContent = summary.csharp.due;
+
+      // --- Ostatnia sesja (F7) ---
+      var last = summary.last_session;
+      var lastText = "To będzie Twoja pierwsza sesja.";
+      if (last) {
+        var ago = daysAgo(last.date);
+        var when = ago <= 0 ? "dziś" : ago === 1 ? "wczoraj" : ago + " dni temu";
+        var tasksWord = last.count === 1 ? "zadanie" : (last.count % 10 >= 2 && last.count % 10 <= 4 && (last.count % 100 < 12 || last.count % 100 > 14) ? "zadania" : "zadań");
+        lastText = "Ostatnia sesja była " + when + ", powtórzyłeś wtedy " + last.count + " " + tasksWord + ".";
+      }
+      document.getElementById("last-session").textContent = (n > 0 ? "Zaczniesz od zadań, które czekają najdłużej. " : "") + lastText;
+
+      // --- Przycisk startu ---
+      var start = document.getElementById("start");
+      start.href = "/task.html?session=" + (language || "all");
+      start.hidden = n === 0;
+
+      // --- Talia kart albo „wszystko powtórzone” ---
+      document.getElementById("deck").hidden = n === 0;
+      document.getElementById("all-done").hidden = n !== 0;
+      var note = document.getElementById("queue-note");
+      if (n > 0) {
+        var first = queue[0];
+        var chip = document.getElementById("deck-lang");
+        chip.className = "chip " + first.language;
+        chip.textContent = LANG[first.language];
+        document.getElementById("deck-kind").textContent = first.kind;
+        document.getElementById("deck-title").textContent = first.title;
+        // Opis bez znaczników Markdown (w karcie to tylko zapowiedź)
+        document.getElementById("deck-desc").textContent = first.description
+          .replace(/[`*#>]/g, "")
+          .replace(/(^|\s)_|_(\s|$)/g, "$1$2");
+        document.getElementById("deck-last").textContent = first.last_reviewed_at
+          ? "Ostatnio " + (daysAgo(first.last_reviewed_at) <= 0 ? "dziś" : daysAgo(first.last_reviewed_at) === 1 ? "wczoraj" : daysAgo(first.last_reviewed_at) + " dni temu")
+          : "Nowe zadanie";
+        var pill = document.getElementById("deck-rating");
+        pill.hidden = !first.last_rating;
+        if (first.last_rating) {
+          pill.className = "pill " + first.last_rating;
+          pill.textContent = RATING[first.last_rating];
+        }
+        document.getElementById("deck-2").textContent = queue[1] ? queue[1].title : "";
+        document.getElementById("deck-2").hidden = !queue[1];
+        document.getElementById("deck-3").textContent = queue[2] ? queue[2].title : "";
+        document.getElementById("deck-3").hidden = !queue[2];
+        note.hidden = false;
+        note.textContent = n > 3 ? "Za nimi jeszcze " + (n - 3) + " w kolejce" : "To cała kolejka na dziś";
+      } else {
+        note.hidden = true;
+        var next = null;
+        for (var i = 1; i < forecast.length; i++) {
+          if (forecast[i].count > 0) { next = forecast[i]; break; }
+        }
+        document.getElementById("next-review").textContent = next
+          ? "Najbliższa powtórka: " + parseDay(next.date).toLocaleDateString("pl-PL", { weekday: "long", day: "numeric", month: "long" }) + "."
+          : "W najbliższych dwóch tygodniach nie masz zaplanowanych powtórek.";
+      }
+
+      // --- Wykres 14 dni (F3) ---
+      var box = document.getElementById("forecast");
+      box.innerHTML = "";
+      forecast.forEach(function (day, index) {
+        var date = parseDay(day.date);
+        var label = index === 0 ? "dziś" : WEEKDAY[date.getDay()] + " " + date.getDate();
+        var col = document.createElement("div");
+        col.className = "day";
+        col.setAttribute("aria-label", (index === 0 ? "Dziś" : label) + ": " + day.count);
+        col.innerHTML = '<span class="n"></span><div class="col"></div><span class="label"></span>';
+        col.querySelector(".n").textContent = day.count > 0 ? day.count : "";
+        var bar = col.querySelector(".col");
+        bar.style.height = (day.count === 0 ? 4 : 12 + Math.min(day.count, 12) * 14) + "px";
+        if (index === 0) bar.classList.add("today");
+        else if (day.count === 0) bar.classList.add("zero");
+        var dayLabel = col.querySelector(".label");
+        dayLabel.textContent = label;
+        if (index === 0) dayLabel.classList.add("today");
+        box.appendChild(col);
+      });
+    })
+    .catch(function (err) { showError("Nie udało się pobrać danych z serwera (" + err.message + "). Czy serwer działa?"); });
 }
 
 var todayText = new Date().toLocaleDateString("pl-PL", { weekday: "long", day: "numeric", month: "long" });
-document.getElementById("today").textContent = todayText;
+document.getElementById("today").textContent = todayText.charAt(0).toUpperCase() + todayText.slice(1);
 
-fetch("/api/summary")
-  .then(function (res) { if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-  .then(function (summary) {
-    var all = summary.python.due + summary.csharp.due;
-    document.getElementById("headline").textContent = "Do powtórki dziś: " + all + " " + zadan(all);
-
-    ["python", "csharp"].forEach(function (lang) {
-      var s = summary[lang];
-      document.getElementById(lang + "-due").textContent = s.due;
-      document.getElementById(lang + "-total").textContent = s.total + " " + zadan(s.total) + " łącznie";
-      // Przycisk języka bez zadań na dziś nie ma sensu — ukrywamy go
-      document.getElementById(lang + "-go").hidden = s.due === 0;
-    });
-
-    document.getElementById("all-label").textContent = "Zacznij powtórkę — wszystkie języki (" + all + ")";
-    document.getElementById("all-go").hidden = all === 0;
-    document.getElementById("done").hidden = all !== 0;
-  })
-  .catch(function (err) {
-    var box = document.getElementById("error");
-    box.textContent = "Nie udało się pobrać danych z serwera (" + err.message + "). Czy serwer działa?";
-    box.hidden = false;
+document.querySelectorAll("#filters button").forEach(function (button) {
+  button.addEventListener("click", function () {
+    document.querySelectorAll("#filters button").forEach(function (b) { b.classList.remove("on"); });
+    button.classList.add("on");
+    language = button.dataset.lang;
+    load();
   });
+});
+
+load();
 </script>
 </body>
 </html>

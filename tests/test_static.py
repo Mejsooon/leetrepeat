@@ -22,7 +22,7 @@ def test_vendor_and_shared_files_served(client):
 
 def test_pages_served(client):
     home = client.get("/").text
-    assert "Do powtórki dziś" in home and "theme-toggle" in home
+    assert "Zacznij powtórkę" in home and "theme-toggle" in home
     assert "Wszystkie zadania" in client.get("/list.html").text
 
 
@@ -42,3 +42,9 @@ def test_v2_assets_served(client):
     css = client.get("/style.css").text
     for needle in ["--forgot", "backdrop-filter", "prefers-reduced-transparency", "IBM Plex Mono", ".sr-only"]:
         assert needle in css, needle
+
+
+def test_today_page_served(client):
+    page = client.get("/").text
+    for needle in ["Zacznij powtórkę", "Najbliższe dwa tygodnie", "theme-toggle"]:
+        assert needle in page, needle
