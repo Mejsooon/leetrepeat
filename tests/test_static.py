@@ -24,3 +24,8 @@ def test_pages_served(client):
     home = client.get("/").text
     assert "Do powtórki dziś" in home and "theme-toggle" in home
     assert "Wszystkie zadania" in client.get("/list.html").text
+
+
+def test_form_served(client):
+    form = client.get("/form.html").text
+    assert "Nowe zadanie" in form and "Sprawdź rozwiązanie na testach" in form
